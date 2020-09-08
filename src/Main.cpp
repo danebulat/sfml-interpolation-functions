@@ -11,13 +11,15 @@ int main(void)
     util::Platform platform;
 
     sf::RenderWindow window(sf::VideoMode(800,600,32), "Robert Penner's Easing Equations with SFML", sf::Style::Default);
-    window.setFramerateLimit(60);
+
+   // NOTE: Set frame rate limit in Engine
+   window.setFramerateLimit(60);
 
     sf::Event e;
     bool running = true;
 
     sf::Font myfont;
-    if(!myfont.loadFromFile("fonts/contb.ttf"))
+    if(!myfont.loadFromFile("content/contb.ttf"))
     {
         std::cerr<<"Could not load your font contb.ttf."<<std::endl;
     }
