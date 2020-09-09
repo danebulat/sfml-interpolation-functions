@@ -5,7 +5,7 @@
 #include "include/button.hpp"
 #include "include/interpolateOld.hpp"
 #include "Platform/Platform.hpp"
-#include "include/interpolate.hpp"
+#include "include/Interpolate.hpp"
 
 #include <cmath>
 
@@ -258,7 +258,7 @@ int main(void)
 
                     float elapsedTime = duration.asSeconds();
 
-                    float xPos = Interpolate::easeInOutBounce(
+                    float xPos = Interpolate::easeOutBounce(
                                     elapsedTime,            // Same unit as total time (d), the starting time
                                     140.0f,                 // The beginning value of the property that we're animating
                                     160.0f,                 // The change between the beginning and destination value of the property.
