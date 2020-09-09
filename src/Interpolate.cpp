@@ -261,7 +261,7 @@ float Interpolate::easeInOutCirc(float t) {
 }
 
 // ease in back - pulls back before easing in
-float Interpolate::easeInBack(float t, float b, float c, float d, float c1=1.70158f) {
+float Interpolate::easeInBack(float t, float b, float c, float d, float c1) {
 	// tweak x for a more dramatic pull back
 	t /= d; // 0-1 on curve
 	float c3 = c1 + 1.f;
@@ -269,13 +269,13 @@ float Interpolate::easeInBack(float t, float b, float c, float d, float c1=1.701
 	return (c * val) + b;
 }
 
-float Interpolate::easeInBack(float t, float c1=1.70158f) {
+float Interpolate::easeInBack(float t, float c1) {
 	float c3 = c1 + 1.f;
 	return c3 * t * t * t - c1 * t * t;
 }
 
 // ease out back - over throws before easing out
-float Interpolate::easeOutBack(float t, float b, float c, float d, float c1=1.70158f) {
+float Interpolate::easeOutBack(float t, float b, float c, float d, float c1) {
 	// tweak c1 value for a more dramatic over throw
 	t /= d; // 0-1 on curve
 	float c3 = c1 + 1.f;
@@ -289,7 +289,7 @@ float Interpolate::easeOutBack(float t, float c1=1.70158f) {
 }
 
 // ease in out back - pull back and over throw
-float Interpolate::easeInOutBack(float t, float b, float c, float d, float c1=1.70158) {
+float Interpolate::easeInOutBack(float t, float b, float c, float d, float c1) {
 	// tweak c1 value for a more dramatic pull back and over throw
 	t /= d;
 	float c2 = c1 * 1.525f;

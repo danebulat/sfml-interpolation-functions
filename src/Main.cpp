@@ -3,13 +3,21 @@
 // #include <THOR/Shapes.hpp>
 // #include <THOR/Graphics.hpp>
 #include "include/button.hpp"
-#include "include/interpolateOld.hpp"
 #include "Platform/Platform.hpp"
 #include "include/Interpolate.hpp"
 
 #include <cmath>
 
 using namespace animation;
+
+sf::CircleShape makeCircle(const sf::Color& color) {
+    sf::CircleShape circle;
+    circle.setRadius(10.0f);
+    circle.setFillColor(color);
+    circle.setOutlineThickness(1.0f);
+    circle.setOutlineColor(sf::Color::White);
+    return circle;
+}
 
 int main(void)
 {
@@ -24,8 +32,7 @@ int main(void)
     bool running = true;
 
     sf::Font myfont;
-    if(!myfont.loadFromFile("content/contb.ttf"))
-    {
+    if(!myfont.loadFromFile("content/contb.ttf")) {
         std::cerr<<"Could not load your font contb.ttf."<<std::endl;
     }
 
@@ -52,7 +59,7 @@ int main(void)
     smoothout.setBorderColor(sf::Color(255,255,255,255));
 
     //smooth curve ease in out
-    gui::button smoothInOut("Ease In-Out\nDemo", myfont, sf::Vector2f(smoothout.getPosition().x + smoothout.getDimensions().x + 20.f,53.f), gui::style::clean);
+    gui::button smoothInOut("Ease In-Out\nDemo", myfont, sf::Vector2f(smoothout.getPosition().x + smoothout.getDimensions().x + 25.f,53.f), gui::style::clean);
     smoothInOut.setSize(14);
     smoothInOut.setLabelOffset(sf::Vector2f(0.f,5.f));
     smoothInOut.makeActive(true);
@@ -60,68 +67,32 @@ int main(void)
     smoothInOut.setBorderRadius(0.f);
     smoothInOut.setBorderColor(sf::Color(255,255,255,255));
 
-    //set up shapes to ease
-    //sf::ConvexShape star = thor::Shapes::star(5,2.f, 10.f, sf::Color(255,255,255,255), 1.f, sf::Color(255,0,0,255));
+    auto circle_linear = makeCircle(sf::Color::Red);
+    auto circle_quadratic = makeCircle(sf::Color::Blue);
+    auto circle_cubic = makeCircle(sf::Color::Yellow);
+    auto circle_quartic = makeCircle(sf::Color::Green);
+    auto circle_quintic = makeCircle(sf::Color::Cyan);
+    auto circle_sinesoidal = makeCircle(sf::Color::Magenta);
+    auto circle_exponential = makeCircle(sf::Color::Red);
+    auto circle_circular = makeCircle(sf::Color::Blue);
+    auto circle_back = makeCircle(sf::Color::Yellow);
+    auto circle_elastic = makeCircle(sf::Color::Green);
+    auto circle_bounce = makeCircle(sf::Color::Cyan);
 
-    sf::CircleShape star;
-    star.setRadius(10.0f);
-    star.setFillColor(sf::Color(255,0,0,255));
-    star.setOutlineThickness(1.0f);
-    star.setOutlineColor(sf::Color(255,255,255,255));
-
-    //sf::ConvexShape box = thor::Shapes::roundedRect(sf::Vector2f(20.f,20.f), 5.f, sf::Color(255,255,255,255), 1.f, sf::Color(255,255,255,255));
-
-    sf::RectangleShape box;
-    box.setSize(sf::Vector2f(20.f,20.f));
-    box.setFillColor(sf::Color(255,255,255,255));
-    box.setOutlineThickness(1.0f);
-    box.setOutlineColor(sf::Color(255,255,255,255));
-
-    //sf::ConvexShape poly = thor::Shapes::polygon(5, 10.f, sf::Color(255,255,0,255), 1.f, sf::Color(255,0,255,255));
-    sf::RectangleShape poly;
-    poly.setSize(sf::Vector2f(20.f,20.f));
-    poly.setFillColor(sf::Color(255,255,255,255));
-    poly.setOutlineThickness(1.0f);
-    poly.setOutlineColor(sf::Color(255,255,255,255));
-
-    sf::CircleShape circ;
-    circ.setRadius(10.0f);
-    circ.setFillColor(sf::Color(0,255,0,255));
-
-    // sf::CircleShape circ;
-    // circ.setRadius(10.f);
-    // circ.setFillColor(sf::Color(0,255,0,255));
-
-    sf::CircleShape star2 = star;
-    sf::RectangleShape box2 = box;
-    sf::CircleShape circ2 = circ;
-
-    sf::CircleShape star3 = star;
-    sf::RectangleShape box3 = box;
-    sf::RectangleShape poly3 = poly;
-
-    // sf::ConvexShape star2 = star;
-    // sf::ConvexShape box2 = box;
-    // sf::CircleShape circ2 = circ;
-    // sf::ConvexShape star3 = star;
-    // sf::ConvexShape box3 = box;
-    // sf::ConvexShape poly3 = poly;
-
-    //initialize shape positions
-    star.setPosition(140.f, 100.f);
-    box.setPosition(140.f, 125.f);
-    poly.setPosition(140.f, 170.f);
-    circ.setPosition(140.f, 200.f);
-    star2.setPosition(140.f, 240.f);
-    box2.setPosition(140.f, 270.f);
-    circ2.setPosition(140.f, 310.f);
-    star3.setPosition(140.f, 350.f);
-    box3.setPosition(140.f, 380.f);
-    poly3.setPosition(140.f, 430.f);
-
+    circle_linear.setPosition(140.f, 90.f);
+    circle_quadratic.setPosition(140.f, 130.f);
+    circle_cubic.setPosition(140.f, 162.f);
+    circle_quartic.setPosition(140.f, 198.f);
+    circle_quintic.setPosition(140.f, 234.f);
+    circle_sinesoidal.setPosition(140.f, 270.f);
+    circle_exponential.setPosition(140.f, 306.f);
+    circle_circular.setPosition(140.f, 342.f);
+    circle_back.setPosition(140.f, 378.f);
+    circle_elastic.setPosition(140.f, 414.f);
+    circle_bounce.setPosition(140.f, 450.f);
 
     //set up labels
-    sf::Text label("Linear\n\nExponential\n\nCubic\n\nQuartic\n\nQuintic\n\nQuadratic\n\nSinusoidal\n\nCircular\n\nBack\n\nElastic", myfont);
+    sf::Text label("Linear\n\nQuadratic\n\nCubic\n\nQuartic\n\nQuintic\n\nSinusoidal\n\nExponential\n\nCircular\n\nBack\n\nElastic\n\nBounce", myfont);
     label.setPosition(10.f, 90.f);
     label.setCharacterSize(18);
 
@@ -182,16 +153,17 @@ int main(void)
             if(e.type == sf::Event::MouseButtonPressed && e.mouseButton.button == sf::Mouse::Left)
             {
                 duration = sf::Time::Zero;
-                star.setPosition(140.f, 100.f);
-                box.setPosition(140.f, 125.f);
-                poly.setPosition(140.f, 170.f);
-                circ.setPosition(140.f, 200.f);
-                star2.setPosition(140.f, 240.f);
-                box2.setPosition(140.f, 270.f);
-                circ2.setPosition(140.f, 310.f);
-                star3.setPosition(140.f, 350.f);
-                box3.setPosition(140.f, 380.f);
-                poly3.setPosition(140.f, 430.f);
+                circle_linear.setPosition(140.f, 90.f);
+                circle_quadratic.setPosition(140.f, 127.f);
+                circle_cubic.setPosition(140.f, 162.f);
+                circle_quartic.setPosition(140.f, 198.f);
+                circle_quintic.setPosition(140.f, 234.f);
+                circle_sinesoidal.setPosition(140.f, 270.f);
+                circle_exponential.setPosition(140.f, 306.f);;
+                circle_circular.setPosition(140.f, 342.f);
+                circle_back.setPosition(140.f, 378.f);
+                circle_elastic.setPosition(140.f, 414.f);
+                circle_bounce.setPosition(140.f, 450.f);
             }
         }
 
@@ -215,6 +187,9 @@ int main(void)
 
         timeSinceLastUpdate += tickClock.restart();     // Increment time accumulated since last frame
 
+        float changeX = 200.0f;
+        float dur = 1.5f;
+
         while (timeSinceLastUpdate > TimePerFrame)      // While accumulated time is greater than 1/60th of a second
         {
             timeSinceLastUpdate -= TimePerFrame;        // Subtract 1/60 of a second from timeSinceLastFrame
@@ -225,74 +200,75 @@ int main(void)
             {
             case 0:
             {
-                if(duration.asSeconds() < 1.f)          // Call interpolation function if duration less than 1 second
+                /* Ease-In Functions */
+                if(duration.asSeconds() < dur)          // Call interpolation function if duration less than 1 second
                 {
-                    star.move(10.f * interpolate::linear(duration.asSeconds(),
-                              0.f,          // Start value being interpolated
-                              1.f,          // Change in value
-                              1.f),         // Duration
-                              0.f);
+                    float t = duration.asSeconds();
 
-                    box.move(10.f*interpolate::expoEaseIn(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    poly.move(10.f*interpolate::cubicEaseIn(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    circ.move(10.f*interpolate::quarticEaseIn(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    star2.move(10.f*interpolate::quinticEaseIn(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    box2.move(10.f*interpolate::quadraticEaseIn(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    circ2.move(10.f*interpolate::sineEaseIn(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    star3.move(10.f*interpolate::circularEaseIn(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    box3.move(10.f*interpolate::backEaseIn(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    poly3.move(10.f*interpolate::elasticEaseIn(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
+                    circle_linear.setPosition(Interpolate::linear(t, 140.f, changeX, dur), 90.f);
+                    circle_quadratic.setPosition(Interpolate::easeInQuad(t, 140.f, changeX, dur), 127.f);
+                    circle_cubic.setPosition(Interpolate::easeInCubic(t, 140.f, changeX, dur), 162.f);
+                    circle_quartic.setPosition(Interpolate::easeInQuart(t, 140.f, changeX, dur), 198.f);
+                    circle_quintic.setPosition(Interpolate::easeInQuint(t, 140.f, changeX, dur), 234.f);
+                    circle_sinesoidal.setPosition(Interpolate::easeInSine(t, 140.f, changeX, dur), 270.f);
+                    circle_exponential.setPosition(Interpolate::easeInExpo(t, 140.f, changeX, dur), 306.f);
+                    circle_circular.setPosition(Interpolate::easeInCirc(t, 140.f, changeX, dur), 342.f);
+                    circle_back.setPosition(Interpolate::easeInBack(t, 140.f, changeX, dur), 378.f);
+                    circle_elastic.setPosition(Interpolate::easeInElastic(t, 140.f, changeX, dur), 414.f);
+                    circle_bounce.setPosition(Interpolate::easeInBounce(t, 140.f, changeX, dur), 450.f);
                 }
             }
             break;
             case 1:
             {
-                if(duration.asSeconds() < 1.f)  // Call interpolation function if duration is less than x second
+                /* Ease-Out Functions */
+                if(duration.asSeconds() < dur)  // Call interpolation function if duration is less than x second
                 {
-                    // Must normalize the duration between 0-1 for correct input to function's graph (0-1)
-                    float graphX = duration.asSeconds() / 1.f;
-                    float multiplier = 10.0f;
+                    // float elapsedTime = duration.asSeconds();
+                    // float xPos = Interpolate::easeOutBounce(
+                    //                 elapsedTime,            // Same unit as total time (d), the starting time
+                    //                 140.0f,                 // The beginning value of the property that we're animating
+                    //                 160.0f,                 // The change between the beginning and destination value of the property.
+                    //                 1.f);                   // Total time of the tween
+                    //
+                    // std::cout << "xPos: " << xPos << "\tduration: " << duration.asSeconds() << std::endl;
+                    // std::cout.flush();
+                    // circle_linear.setPosition(xPos, 170.0f);
 
-                    star.move(multiplier*interpolate::linear(graphX, 0.f, 1.f, 1.f), 0.f);
-                    box.move(multiplier*interpolate::expoEaseOut(graphX, 0.f, 1.f, 1.f), 0.f);
+                    float t = duration.asSeconds();
 
-                    float elapsedTime = duration.asSeconds();
-
-                    float xPos = Interpolate::easeOutBounce(
-                                    elapsedTime,            // Same unit as total time (d), the starting time
-                                    140.0f,                 // The beginning value of the property that we're animating
-                                    160.0f,                 // The change between the beginning and destination value of the property.
-                                    1.f);                   // Total time of the tween
-
-                    std::cout << "xPos: " << xPos << "\tduration: " << duration.asSeconds() << std::endl;
-                    std::cout.flush();
-
-                    poly.setPosition(xPos, 170.0f);
-
-                    circ.move(multiplier*interpolate::quarticEaseOut(graphX, 0.f, 1.f, 1.f), 0.f);
-                    star2.move(multiplier*interpolate::quinticEaseOut(graphX, 0.f, 1.f, 1.f), 0.f);
-                    box2.move(multiplier*interpolate::quadraticEaseOut(graphX, 0.f, 1.f, 1.f), 0.f);
-                    circ2.move(multiplier*interpolate::sineEaseOut(graphX, 0.f, 1.f, 1.f), 0.f);
-                    star3.move(multiplier*interpolate::circularEaseOut(graphX, 0.f, 1.f, 1.f), 0.f);
-                    box3.move(multiplier*interpolate::backEaseOut(graphX, 0.f, 1.f, 1.f), 0.f);
-                    poly3.move(multiplier*interpolate::elasticEaseOut(graphX, 0.f, 1.f, 1.f), 0.f);
+                    circle_linear.setPosition(Interpolate::linear(t, 140.f, changeX, dur), 90.f);
+                    circle_quadratic.setPosition(Interpolate::easeOutQuad(t, 140.f, changeX, dur), 127.f);
+                    circle_cubic.setPosition(Interpolate::easeOutCubic(t, 140.f, changeX, dur), 162.f);
+                    circle_quartic.setPosition(Interpolate::easeOutQuart(t, 140.f, changeX, dur), 198.f);
+                    circle_quintic.setPosition(Interpolate::easeOutQuint(t, 140.f, changeX, dur), 234.f);
+                    circle_sinesoidal.setPosition(Interpolate::easeOutSine(t, 140.f, changeX, dur), 270.f);
+                    circle_exponential.setPosition(Interpolate::easeOutExpo(t, 140.f, changeX, dur), 306.f);
+                    circle_circular.setPosition(Interpolate::easeOutCirc(t, 140.f, changeX, dur), 342.f);
+                    circle_back.setPosition(Interpolate::easeOutBack(t, 140.f, changeX, dur), 378.f);
+                    circle_elastic.setPosition(Interpolate::easeOutElastic(t, 140.f, changeX, dur), 414.f);
+                    circle_bounce.setPosition(Interpolate::easeOutBounce(t, 140.f, changeX, dur), 450.f);
                 }
             }
             break;
             case 2:
             {
-                if(duration.asSeconds() < 1.f)
+                /* Ease-In-Out Functions */
+                if(duration.asSeconds() < dur)
                 {
-                    star.move(10.f*interpolate::linear(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    box.move(10.f*interpolate::expoEaseInOut(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    poly.move(10.f*interpolate::cubicEaseInOut(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    circ.move(10.f*interpolate::quarticEaseInOut(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    star2.move(10.f*interpolate::quinticEaseInOut(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    box2.move(10.f*interpolate::quadraticEaseInOut(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    circ2.move(10.f*interpolate::sineEaseInOut(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    star3.move(10.f*interpolate::circularEaseInOut(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    box3.move(10.f*interpolate::backEaseInOut(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    poly3.move(10.f*interpolate::elasticEaseInOut(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
+                    float t = duration.asSeconds();
+
+                    circle_linear.setPosition(Interpolate::linear(t, 140.f, changeX, dur), 90.f);
+                    circle_quadratic.setPosition(Interpolate::easeInOutQuad(t, 140.f, changeX, dur), 127.f);
+                    circle_cubic.setPosition(Interpolate::easeInOutCubic(t, 140.f, changeX, dur), 162.f);
+                    circle_quartic.setPosition(Interpolate::easeInOutQuart(t, 140.f, changeX, dur), 198.f);
+                    circle_quintic.setPosition(Interpolate::easeInOutQuint(t, 140.f, changeX, dur), 234.f);
+                    circle_sinesoidal.setPosition(Interpolate::easeInOutSine(t, 140.f, changeX, dur), 270.f);
+                    circle_exponential.setPosition(Interpolate::easeInOutExpo(t, 140.f, changeX, dur), 306.f);
+                    circle_circular.setPosition(Interpolate::easeInOutCirc(t, 140.f, changeX, dur), 342.f);
+                    circle_back.setPosition(Interpolate::easeInOutBack(t, 140.f, changeX, dur), 378.f);
+                    circle_elastic.setPosition(Interpolate::easeInOutElastic(t, 140.f, changeX, dur), 414.f);
+                    circle_bounce.setPosition(Interpolate::easeInOutBounce(t, 140.f, changeX, dur), 450.f);
                 }
             }
             break;
@@ -307,17 +283,21 @@ int main(void)
         window.draw(smoothin);
         window.draw(smoothout);
         window.draw(smoothInOut);
+
         window.draw(label);
-        window.draw(star);
-        window.draw(box);
-        window.draw(poly);
-        window.draw(circ);
-        window.draw(star2);
-        window.draw(box2);
-        window.draw(circ2);
-        window.draw(star3);
-        window.draw(box3);
-        window.draw(poly3);
+
+        window.draw(circle_linear);
+        window.draw(circle_quadratic);
+        window.draw(circle_cubic);
+        window.draw(circle_quartic);
+        window.draw(circle_quintic);
+        window.draw(circle_sinesoidal);
+        window.draw(circle_exponential);
+        window.draw(circle_circular);
+        window.draw(circle_back);
+        window.draw(circle_elastic);
+        window.draw(circle_bounce);
+
         window.display();
     }
     return 0;

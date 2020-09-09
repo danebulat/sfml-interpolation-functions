@@ -9,6 +9,8 @@ namespace animation {
     Interpolation functions implemented for all the standard easing
 	functions documented here:
 	https://easings.net/
+
+	Functions with a single float parameter accept a value between 0 and 1.
 	*/
 
 	class Interpolate {
@@ -16,9 +18,9 @@ namespace animation {
 		static const float fPI;
 
 	public:
-		// Interpolate() = delete;
-		// Interpolate(const Interpolate&) = delete;
-		// Interpolate& operator= (const Interpolate&) = delete;
+		Interpolate() = delete;
+		Interpolate(const Interpolate&) = delete;
+		Interpolate& operator= (const Interpolate&) = delete;
 
 		// linear - no easing, no acceleration
 		static float linear(float t, float b, float c, float d);
@@ -108,15 +110,15 @@ namespace animation {
 		static float easeInOutCirc(float t);
 
 		// ease in back - pulls back before easing in
-		static float easeInBack(float t, float b, float c, float d, float c1);
+		static float easeInBack(float t, float b, float c, float d, float c1=1.70158f);
 		static float easeInBack(float t, float c1);
 
 		// ease out back - over throws before easing out
-		static float easeOutBack(float t, float b, float c, float d, float c1);
+		static float easeOutBack(float t, float b, float c, float d, float c1=1.70158f);
 		static float easeOutBack(float t, float c1);
 
 		// ease in out back - pull back and over throw
-		static float easeInOutBack(float t, float b, float c, float d, float c1);
+		static float easeInOutBack(float t, float b, float c, float d, float c1=1.70158f);
 		static float easeInOutBack(float t, float c1);
 
 		// ease in elastic
@@ -133,14 +135,10 @@ namespace animation {
 
 		// ease out bounce
 		static float easeOutBounce(float t, float b, float c, float d);
-
-		// ease out bounce - pass value between 0 and 1 (also utility for easeInBounce())
 		static float easeOutBounce(float t);
 
 		// ease in bounce
 		static float easeInBounce(float t, float b, float c, float d);
-
-		// ease in bounce - pass value between 0 and 1 (utility for easeInOutBounce())
 		static float easeInBounce(float t);
 
 		// ease in out bounce
