@@ -3,8 +3,13 @@
 // #include <THOR/Shapes.hpp>
 // #include <THOR/Graphics.hpp>
 #include "include/button.hpp"
-#include "include/interpolate.hpp"
+#include "include/interpolateOld.hpp"
 #include "Platform/Platform.hpp"
+#include "include/interpolate.hpp"
+
+#include <cmath>
+
+using namespace animation;
 
 int main(void)
 {
@@ -124,6 +129,7 @@ int main(void)
     sf::Clock tickClock;
     sf::Time timeSinceLastUpdate = sf::Time::Zero;
     sf::Time duration = sf::Time::Zero;
+
     sf::Time TimePerFrame = sf::seconds(1.f/60.f);
 
     while(running)
@@ -207,18 +213,26 @@ int main(void)
             easetype = 2;
         }
 
-        timeSinceLastUpdate += tickClock.restart();
-        while (timeSinceLastUpdate > TimePerFrame)
+        timeSinceLastUpdate += tickClock.restart();     // Increment time accumulated since last frame
+
+        while (timeSinceLastUpdate > TimePerFrame)      // While accumulated time is greater than 1/60th of a second
         {
-            timeSinceLastUpdate -= TimePerFrame;
-            duration += TimePerFrame;
+            timeSinceLastUpdate -= TimePerFrame;        // Subtract 1/60 of a second from timeSinceLastFrame
+
+            duration += TimePerFrame;                   // Add 1/60 of a second to duration
+
             switch(easetype)
             {
             case 0:
             {
-                if(duration.asSeconds() < 1.f)
+                if(duration.asSeconds() < 1.f)          // Call interpolation function if duration less than 1 second
                 {
-                    star.move(10.f*interpolate::linear(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
+                    star.move(10.f * interpolate::linear(duration.asSeconds(),
+                              0.f,          // Start value being interpolated
+                              1.f,          // Change in value
+                              1.f),         // Duration
+                              0.f);
+
                     box.move(10.f*interpolate::expoEaseIn(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
                     poly.move(10.f*interpolate::cubicEaseIn(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
                     circ.move(10.f*interpolate::quarticEaseIn(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
@@ -233,18 +247,35 @@ int main(void)
             break;
             case 1:
             {
-                if(duration.asSeconds() < 1.f)
+                if(duration.asSeconds() < 1.f)  // Call interpolation function if duration is less than x second
                 {
-                    star.move(10.f*interpolate::linear(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    box.move(10.f*interpolate::expoEaseOut(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    poly.move(10.f*interpolate::cubicEaseOut(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    circ.move(10.f*interpolate::quarticEaseOut(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    star2.move(10.f*interpolate::quinticEaseOut(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    box2.move(10.f*interpolate::quadraticEaseOut(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    circ2.move(10.f*interpolate::sineEaseOut(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    star3.move(10.f*interpolate::circularEaseOut(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    box3.move(10.f*interpolate::backEaseOut(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
-                    poly3.move(10.f*interpolate::elasticEaseOut(duration.asSeconds(), 0.f, 1.f, 1.f), 0.f);
+                    // Must normalize the duration between 0-1 for correct input to function's graph (0-1)
+                    float graphX = duration.asSeconds() / 1.f;
+                    float multiplier = 10.0f;
+
+                    star.move(multiplier*interpolate::linear(graphX, 0.f, 1.f, 1.f), 0.f);
+                    box.move(multiplier*interpolate::expoEaseOut(graphX, 0.f, 1.f, 1.f), 0.f);
+
+                    float elapsedTime = duration.asSeconds();
+
+                    float xPos = Interpolate::easeInOutBounce(
+                                    elapsedTime,            // Same unit as total time (d), the starting time
+                                    140.0f,                 // The beginning value of the property that we're animating
+                                    160.0f,                 // The change between the beginning and destination value of the property.
+                                    1.f);                   // Total time of the tween
+
+                    std::cout << "xPos: " << xPos << "\tduration: " << duration.asSeconds() << std::endl;
+                    std::cout.flush();
+
+                    poly.setPosition(xPos, 170.0f);
+
+                    circ.move(multiplier*interpolate::quarticEaseOut(graphX, 0.f, 1.f, 1.f), 0.f);
+                    star2.move(multiplier*interpolate::quinticEaseOut(graphX, 0.f, 1.f, 1.f), 0.f);
+                    box2.move(multiplier*interpolate::quadraticEaseOut(graphX, 0.f, 1.f, 1.f), 0.f);
+                    circ2.move(multiplier*interpolate::sineEaseOut(graphX, 0.f, 1.f, 1.f), 0.f);
+                    star3.move(multiplier*interpolate::circularEaseOut(graphX, 0.f, 1.f, 1.f), 0.f);
+                    box3.move(multiplier*interpolate::backEaseOut(graphX, 0.f, 1.f, 1.f), 0.f);
+                    poly3.move(multiplier*interpolate::elasticEaseOut(graphX, 0.f, 1.f, 1.f), 0.f);
                 }
             }
             break;

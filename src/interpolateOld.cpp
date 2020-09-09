@@ -1,4 +1,6 @@
-#include "include/interpolate.hpp"
+#include "include/interpolateOld.hpp"
+#include <iostream>
+using namespace std;
 
 interpolate::interpolate()
 {
@@ -42,9 +44,29 @@ float interpolate::cubicEaseIn(float t, float b, float c, float d)
     return (t==0) ? b : c * pow(3, 10 * (t/d - 1)) + b;
 }
 
+// float interpolate::cubicEaseOut(float t, float b, float c, float d)
+// {
+//     float val = (t==d) ? b+c : c * pow(3, 1-(10 * t/d)) + b;
+//     //cout << /*"start time: \t" << t << */ "val: \t\t"<< val << "\nt/d:\t\t" << t/d << "\n";
+//     return val;
+// }
+
+// float interpolate::cubicEaseOut(float t, float b, float c, float d)
+// {
+//     return (t==d) ? b+c : c * pow(3, 1-(10 * t/d)) + b;
+// }
+
 float interpolate::cubicEaseOut(float t, float b, float c, float d)
 {
-    return (t==d) ? b+c : c * pow(3, 1-(10 * t/d)) + b;
+    float multiplier = powf(3.0f, 1.0f-(10.0f * t/d));
+
+    //cout << "multiplier: " << multiplier << "\n";
+
+    float val = (c * multiplier) + b;
+    return val;
+
+
+    //return (t==d) ? b+c : c * pow(3, 1-(10 * t/d)) + b;
 }
 
 float interpolate::cubicEaseInOut(float t, float b, float c, float d)
