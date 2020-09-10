@@ -15,15 +15,91 @@ Circle makeCircle(const sf::Color& color) {
     return Circle(color);
 }
 
-int main(void)
+int EasingDemo(RenderWindow&);
+
+int main()
 {
     util::Platform platform;
 
     sf::RenderWindow window(sf::VideoMode(800,600,32), "Robert Penner's Easing Equations with SFML", sf::Style::Default);
 
-   // NOTE: Set frame rate limit in Engine
-   window.setFramerateLimit(60);
+    // NOTE: Set frame rate limit in Engine
+    window.setFramerateLimit(60);
 
+    //return EasingDemo(window);
+
+    // Circle demo
+    Circle circle(Vector2f(30.f, 275.f), Color::Yellow, 50.f);
+    circle.createDemoTween();
+
+    sf::Clock clock;
+
+    sf::Font myfont;
+    if(!myfont.loadFromFile("content/DroidSansMono.ttf")) {
+        std::cerr<<"Could not load your font contb.ttf."<<std::endl;
+    }
+
+    std::string text = ""
+        "---------------------------------------------\n\n"
+        "Controls\n"
+        "---------------------------------------------\n\n"
+        "Enter:        Toggle tween start() and stop()\n\n"
+        "Left Shift:   resetAndStop()\n\n"
+        "Right Shift:  resetAndPlay()\n\n"
+        "---------------------------------------------";
+
+    sf::Text label(text, myfont);
+    label.setPosition(20.f, 20.f);
+    label.setCharacterSize(14);
+
+    while (window.isOpen())
+    {
+        sf::Time dt = clock.restart();
+
+        // Input
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            // Close window: exit
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            }
+
+            if (event.type == sf::Event::KeyReleased)
+            {
+                if (event.key.code == sf::Keyboard::Escape) {
+                    window.close();
+                }
+
+                // Enter key starts tween from beginning
+                if (event.key.code == sf::Keyboard::Enter) {
+                    circle.startStopTweenToggle();
+                }
+
+                if (event.key.code == sf::Keyboard::RShift) {
+                    circle.resetTween(false);
+                }
+
+                if (event.key.code == sf::Keyboard::LShift) {
+                    circle.resetTween(true);
+                }
+            }
+        }
+
+        // Update
+        circle.update(dt.asSeconds());
+
+        // Draw
+        window.clear();
+        circle.draw(window);
+        window.draw(label);
+        window.display();
+    }
+
+    return 0;
+}
+
+int EasingDemo(RenderWindow& window) {
     sf::Event e;
     bool running = true;
 
@@ -296,5 +372,6 @@ int main(void)
 
         window.display();
     }
+
     return 0;
 }

@@ -2,8 +2,10 @@
 #define Circle_Hpp
 
 #include <SFML/Graphics.hpp>
+#include "engine/tween.hpp"
 
 using namespace sf;
+using namespace std;
 
 class Circle {
 private:
@@ -13,6 +15,8 @@ private:
 	static const float DEFAULT_POSITION;
 	static const float DEFAULT_RADIUS;
 	static const float DEFAULT_LINE_THICKNESS;
+
+	Tween* m_tween;
 
 private:
 	void initialise();
@@ -30,8 +34,14 @@ public:
 	void setPosition(const Vector2f& position);
 	void setPosition(float x, float y);
 
-	void update(float fps);
+	void update(float dt);
 	void draw(RenderWindow& window);
+
+	// Tween API
+	void createDemoTween();
+	void startStopTweenToggle();
+	void stopTween();
+	void resetTween(bool start);
 };
 
 #endif
