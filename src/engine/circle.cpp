@@ -1,4 +1,5 @@
 #include "engine/circle.hpp"
+#include "engine/utils.hpp"
 
 /*------------------------------------------------------------
   Static member initialisation
@@ -25,7 +26,8 @@ Circle::Circle(const Vector2f& position,
 	   const Color& color,
 	   const float radius) {
 
-	m_tween = nullptr;
+	m_tweenA = nullptr;
+	m_tweenB = nullptr;
 	m_position = position;
 
 	m_sprite.setPosition(position);
@@ -36,10 +38,8 @@ Circle::Circle(const Vector2f& position,
 }
 
 Circle::~Circle() {
-	if (m_tween != nullptr) {
-		delete m_tween;
-		m_tween = nullptr;
-	}
+	SafeDelete(m_tweenA);
+	SafeDelete(m_tweenB);
 }
 
 /*------------------------------------------------------------
@@ -53,7 +53,7 @@ void Circle::initialise() {
 	m_sprite.setOutlineColor(Color::White);
 	m_sprite.setRadius(DEFAULT_RADIUS);
 
-	m_tween = nullptr;
+	m_tweenA = nullptr;
 	m_position = m_sprite.getPosition();
 }
 
@@ -61,29 +61,65 @@ void Circle::initialise() {
   Tween API
   ------------------------------------------------------------ */
 
-void Circle::createDemoTween() {
-	m_tween = new Tween(&m_position.x, 30.f, (800.f-130.f), 5.f);
+void Circle::createDemoTween(InterpFunc func) {
+	m_tweenA = new Tween(&m_position.x, 30.f, (800.f-130.f), 5.f);
 }
 
 // Starts or stops the tween by inverting its animation flag
 void Circle::startStopTweenToggle() {
-	if (!m_tween->m_isAnimating) {
-		m_tween->start();
+	if (!m_tweenA->m_isAnimating) {
+		m_tweenA->start();
 	}
 	else {
-		m_tween->stop();
+		m_tweenA->stop();
 	}
+}
+
+void Circle::startTween() {
+	m_tweenA->start();
 }
 
 // Stops the tween at its current position
 void Circle::stopTween() {
-	m_tween->stop();
+	m_tweenA->stop();
 }
 
 // Moves object to start position; pass bool for the animation flag
 // NOTE: Return pointer to tween for chaining calls
 void Circle::resetTween(bool start) {
-	start ? m_tween->resetAndPlay() : m_tween->resetAndStop();
+	start ? m_tweenA->resetAndPlay() : m_tweenA->resetAndStop();
+}
+
+
+void Circle::spawnInTween() {
+
+	// We will animate the circle back to its original position.
+	// We shall delete the current tween if it exists because we don't
+	// want it  to interfere with our new tween.
+
+	if (m_tweenA != nullptr) {
+		m_tweenA->stop();
+		SafeDelete(m_tweenA);
+	}
+
+	float target  = 30.0f;
+	float current = m_position.x;
+
+	m_tweenA = new Tween(&m_position.x, current, target, .5f, InterpFunc::QuintEaseOut);
+	m_tweenA->start();
+}
+
+void Circle::spawnOutTween() {
+	if (m_tweenA != nullptr) {
+		m_tweenA->stop();
+		SafeDelete(m_tweenA);
+	}
+
+	float target = 670.f;
+	float current = m_position.x;
+
+	m_tweenA = new Tween(&m_position.x, current, target, 2.f, InterpFunc::BounceEaseOut);
+	m_tweenA->start();
 }
 
 /*------------------------------------------------------------
@@ -110,7 +146,7 @@ void Circle::setPosition(float x, float y) {
   ------------------------------------------------------------ */
 
 void Circle::update(float dt) {
-	m_tween->update(dt);				// update position
+	m_tweenA->update(dt);				// update position
 	m_sprite.setPosition(m_position);	// apply position
 }
 

@@ -44,8 +44,8 @@ int main()
         "Controls\n"
         "---------------------------------------------\n\n"
         "Enter:        Toggle tween start() and stop()\n\n"
-        "Left Shift:   resetAndStop()\n\n"
-        "Right Shift:  resetAndPlay()\n\n"
+        "Right Shift:  spawnOutTween()\n\n"
+        "Left Shift:   spawnInTween()\n\n"
         "---------------------------------------------";
 
     sf::Text label(text, myfont);
@@ -76,12 +76,12 @@ int main()
                     circle.startStopTweenToggle();
                 }
 
-                if (event.key.code == sf::Keyboard::RShift) {
-                    circle.resetTween(false);
+                if (event.key.code == sf::Keyboard::LShift) {
+                    circle.spawnInTween();
                 }
 
-                if (event.key.code == sf::Keyboard::LShift) {
-                    circle.resetTween(true);
+                if (event.key.code == sf::Keyboard::RShift) {
+                    circle.spawnOutTween();
                 }
             }
         }

@@ -17,8 +17,10 @@ Tween::Tween()
 }
 
 // Custom constructor to initialise data members with custom values.
-Tween::Tween(float* property, float startValue, float targetValue, float duration)
-		: m_startValue(startValue)
+Tween::Tween(float* property, float startValue, float targetValue, float duration,
+			 InterpFunc function)
+		: m_function(function)
+		, m_startValue(startValue)
 		, m_targetValue(targetValue)
 		, m_changeValue(targetValue-startValue)
 		, m_duration(duration)
@@ -70,13 +72,139 @@ void Tween::update(float dt) {
 		}
 
 		// Otherwise, continue the animation
-		float interpolatedValue = Interpolate::easeOutBounce(
-			m_elapsedTime,
-			m_startValue,
-			m_changeValue,
-			m_duration);
+		float t = m_elapsedTime;
+		float b = m_startValue;
+		float c = m_changeValue;
+		float d = m_duration;
 
-		(*m_property) = interpolatedValue;
+		switch (m_function) {
+		case InterpFunc::Linear:
+			(*m_property) = Interpolate::linear(t, b, c, d);
+			break;
+
+		case InterpFunc::QuadEaseIn:
+			(*m_property) = Interpolate::easeInQuad(t, b, c, d);
+			break;
+
+		case InterpFunc::QuadEaseOut:
+			(*m_property) = Interpolate::easeOutQuad(t, b, c, d);
+			break;
+
+		case InterpFunc::QuadEaseInOut:
+			(*m_property) = Interpolate::easeInOutQuad(t, b, c, d);
+			break;
+
+		case InterpFunc::CubicEaseIn:
+			(*m_property) = Interpolate::easeInCubic(t, b, c, d);
+			break;
+
+		case InterpFunc::CubicEaseOut:
+			(*m_property) = Interpolate::easeOutCubic(t, b, c, d);
+			break;
+
+		case InterpFunc::CubicEaseInOut:
+			(*m_property) = Interpolate::easeInOutCubic(t, b, c, d);
+			break;
+
+		case InterpFunc::QuartEaseIn:
+			(*m_property) = Interpolate::easeInQuart(t, b, c, d);
+			break;
+
+		case InterpFunc::QuartEaseOut:
+			(*m_property) = Interpolate::easeOutQuart(t, b, c, d);
+			break;
+
+		case InterpFunc::QuartEaseInOut:
+			(*m_property) = Interpolate::easeInOutQuart(t, b, c, d);
+			break;
+
+		case InterpFunc::QuintEaseIn:
+			(*m_property) = Interpolate::easeInQuint(t, b, c, d);
+			break;
+
+		case InterpFunc::QuintEaseOut:
+			(*m_property) = Interpolate::easeOutQuint(t, b, c, d);
+			break;
+
+		case InterpFunc::QuintEaseInOut:
+			(*m_property) = Interpolate::easeInOutQuint(t, b, c, d);
+			break;
+
+		case InterpFunc::SineEaseIn:
+			(*m_property) = Interpolate::easeInSine(t, b, c, d);
+			break;
+
+		case InterpFunc::SineEaseOut:
+			(*m_property) = Interpolate::easeOutSine(t, b, c, d);
+			break;
+
+		case InterpFunc::SineEaseInOut:
+			(*m_property) = Interpolate::easeInOutSine(t, b, c, d);
+			break;
+
+		case InterpFunc::ExpoEaseIn:
+			(*m_property) = Interpolate::easeInExpo(t, b, c, d);
+			break;
+
+		case InterpFunc::ExpoEaseOut:
+			(*m_property) = Interpolate::easeOutExpo(t, b, c, d);
+			break;
+
+		case InterpFunc::ExpoEaseInOut:
+			(*m_property) = Interpolate::easeInOutExpo(t, b, c, d);
+			break;
+
+		case InterpFunc::CircEaseIn:
+			(*m_property) = Interpolate::easeInCirc(t, b, c, d);
+			break;
+
+		case InterpFunc::CircEaseOut:
+			(*m_property) = Interpolate::easeOutCirc(t, b, c, d);
+			break;
+
+		case InterpFunc::CircEaseInOut:
+			(*m_property) = Interpolate::easeInOutCirc(t, b, c, d);
+			break;
+
+		case InterpFunc::BackEaseIn:
+			(*m_property) = Interpolate::easeInBack(t, b, c, d);
+			break;
+
+		case InterpFunc::BackEaseOut:
+			(*m_property) = Interpolate::easeOutBack(t, b, c, d);
+			break;
+
+		case InterpFunc::BackEaseInOut:
+			(*m_property) = Interpolate::easeInOutBack(t, b, c, d);
+			break;
+
+		case InterpFunc::ElasticEaseIn:
+			(*m_property) = Interpolate::easeInElastic(t, b, c, d);
+			break;
+
+		case InterpFunc::ElasticEaseOut:
+			(*m_property) = Interpolate::easeOutElastic(t, b, c, d);
+			break;
+
+		case InterpFunc::ElasticEaseInOut:
+			(*m_property) = Interpolate::easeInOutElastic(t, b, c, d);
+			break;
+
+		case InterpFunc::BounceEaseIn:
+			(*m_property) = Interpolate::easeInBounce(t, b, c, d);
+			break;
+
+		case InterpFunc::BounceEaseOut:
+			(*m_property) = Interpolate::easeOutBounce(t, b, c, d);
+			break;
+
+		case InterpFunc::BounceEaseInOut:
+			(*m_property) = Interpolate::easeInOutBounce(t, b, c, d);
+			break;
+
+		default:
+			(*m_property) = Interpolate::easeOutQuart(t, b, c, d);
+			break;
+		}
 	}
 }
-

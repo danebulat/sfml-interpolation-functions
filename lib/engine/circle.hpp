@@ -16,7 +16,8 @@ private:
 	static const float DEFAULT_RADIUS;
 	static const float DEFAULT_LINE_THICKNESS;
 
-	Tween* m_tween;
+	Tween* m_tweenA;
+	Tween* m_tweenB;
 
 private:
 	void initialise();
@@ -38,10 +39,15 @@ public:
 	void draw(RenderWindow& window);
 
 	// Tween API
-	void createDemoTween();
+	void createDemoTween(InterpFunc func=InterpFunc::QuartEaseOut);
 	void startStopTweenToggle();
+	void startTween();
 	void stopTween();
 	void resetTween(bool start);
+
+	// Dynamic tweens (custom animations for class)
+	void spawnInTween();
+	void spawnOutTween();
 };
 
 #endif
