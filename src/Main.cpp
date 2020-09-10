@@ -2,21 +2,17 @@
 #include <SFML/Graphics.hpp>
 // #include <THOR/Shapes.hpp>
 // #include <THOR/Graphics.hpp>
-#include "include/button.hpp"
+#include "engine/button.hpp"
+#include "engine/circle.hpp"
 #include "Platform/Platform.hpp"
-#include "include/Interpolate.hpp"
+#include "engine/interpolate.hpp"
 
 #include <cmath>
 
 using namespace animation;
 
-sf::CircleShape makeCircle(const sf::Color& color) {
-    sf::CircleShape circle;
-    circle.setRadius(10.0f);
-    circle.setFillColor(color);
-    circle.setOutlineThickness(1.0f);
-    circle.setOutlineColor(sf::Color::White);
-    return circle;
+Circle makeCircle(const sf::Color& color) {
+    return Circle(color);
 }
 
 int main(void)
@@ -188,7 +184,7 @@ int main(void)
         timeSinceLastUpdate += tickClock.restart();     // Increment time accumulated since last frame
 
         float changeX = 200.0f;
-        float dur = 1.5f;
+        float dur = 1.0f;
 
         while (timeSinceLastUpdate > TimePerFrame)      // While accumulated time is greater than 1/60th of a second
         {
@@ -286,17 +282,17 @@ int main(void)
 
         window.draw(label);
 
-        window.draw(circle_linear);
-        window.draw(circle_quadratic);
-        window.draw(circle_cubic);
-        window.draw(circle_quartic);
-        window.draw(circle_quintic);
-        window.draw(circle_sinesoidal);
-        window.draw(circle_exponential);
-        window.draw(circle_circular);
-        window.draw(circle_back);
-        window.draw(circle_elastic);
-        window.draw(circle_bounce);
+        circle_linear.draw(window);
+        circle_quadratic.draw(window);
+        circle_cubic.draw(window);
+        circle_quartic.draw(window);
+        circle_quintic.draw(window);
+        circle_sinesoidal.draw(window);
+        circle_exponential.draw(window);
+        circle_circular.draw(window);
+        circle_back.draw(window);
+        circle_elastic.draw(window);
+        circle_bounce.draw(window);
 
         window.display();
     }
