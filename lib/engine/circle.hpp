@@ -20,6 +20,7 @@ private:
 	Tween* m_tweenA;
 	Tween* m_tweenB;
 
+	bool m_active;
 	bool m_moveLeft;
 	bool m_moveRight;
 	bool m_moveUp;
@@ -27,7 +28,6 @@ private:
 
 private:
 	void initialise();
-	void initMovement();
 
 public:
 	Circle();
@@ -56,6 +56,11 @@ public:
 	bool movingDown() const;
 	bool movingLeft() const;
 	bool movingRight() const;
+
+	void stopMovement();
+	void handleInput(sf::Event& event);
+	void setActive(bool b);
+	bool isActive() const;
 
 	// Tween API
 	void createDemoTween(InterpFunc func=InterpFunc::QuartEaseOut);

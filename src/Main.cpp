@@ -33,11 +33,7 @@ int main()
 
     // Camera switch demo
     Circle player1(Vector2f(30.f, 275.f), sf::Color::Yellow, 30.f);
-
-    player1.moveUp(false);
-    player1.moveDown(false);
-    player1.moveLeft(false);
-    player1.moveRight(false);
+    player1.setActive(true);
 
     Circle player2(Vector2f(175.f, 275.f), sf::Color::Green, 30.f);
 
@@ -63,6 +59,7 @@ int main()
         "Controls\n"
         "---------------------------------------------\n\n"
         "Space:        Switch player()\n\n"
+        "WASD:         Move active player\n\n"
         "---------------------------------------------";
 
     sf::Text label(text, myfont);
@@ -70,6 +67,7 @@ int main()
     label.setCharacterSize(14);
 
     sf::Clock clock;
+    bool player1Active = true;
 
     while (window.isOpen())
     {
@@ -84,21 +82,8 @@ int main()
                 window.close();
             }
 
-            if (event.type == sf::Event::KeyPressed)
-            {
-                if (event.key.code == sf::Keyboard::W) {
-                    player1.moveUp(true);
-                }
-                if (event.key.code == sf::Keyboard::A) {
-                    player1.moveLeft(true);
-                }
-                if (event.key.code == sf::Keyboard::S) {
-                    player1.moveDown(true);
-                }
-                if (event.key.code == sf::Keyboard::D) {
-                    player1.moveRight(true);
-                }
-            }
+            player1.handleInput(event);
+            player2.handleInput(event);
 
             if (event.type == sf::Event::KeyReleased)
             {
@@ -106,22 +91,19 @@ int main()
                     window.close();
                 }
 
-                // Enter key starts tween from beginning
+                // SPACE
                 if (event.key.code == sf::Keyboard::Space) {
+                    // Switch player
+                    if (player1Active) {
+                        player1.setActive(false);
+                        player2.setActive(true);
+                    }
+                    else {
+                        player1.setActive(true);
+                        player2.setActive(false);
+                    }
 
-                }
-
-                if (event.key.code == sf::Keyboard::W) {
-                    player1.moveUp(false);
-                }
-                if (event.key.code == sf::Keyboard::A) {
-                    player1.moveLeft(false);
-                }
-                if (event.key.code == sf::Keyboard::S) {
-                    player1.moveDown(false);
-                }
-                if (event.key.code == sf::Keyboard::D) {
-                    player1.moveRight(false);
+                    player1Active = !player1Active;
                 }
             }
         }
@@ -136,9 +118,11 @@ int main()
         bool clampCameraMinY = false;
         bool clampCameraMaxY = false;
 
-        sf::Vector2f cameraPos;
-        sf::Vector2f playerPos = player1.getCenter();
+        sf::Vector2f cameraPos;     // camera position for this frame
+        sf::Vector2f playerPos;     // position of the active player
         sf::Vector2u backgroundSize = background.getTexture()->getSize();;
+
+        player1Active ? playerPos = player1.getCenter() : playerPos = player2.getCenter();
 
         float cameraMinX = resolution.x * .5f;
         float cameraMaxX = (float)backgroundSize.x - (resolution.x * .5f);

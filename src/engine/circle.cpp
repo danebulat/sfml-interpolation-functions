@@ -27,6 +27,7 @@ Circle::Circle(const Vector2f& position,
 	   const Color& color,
 	   const float radius) {
 
+	m_active = false;
 	m_tweenA = nullptr;
 	m_tweenB = nullptr;
 	m_position = position;
@@ -37,7 +38,7 @@ Circle::Circle(const Vector2f& position,
 	m_sprite.setOutlineThickness(1.f);
 	m_sprite.setOutlineColor(Color::White);
 
-	initMovement();
+	stopMovement();
 }
 
 Circle::~Circle() {
@@ -56,17 +57,66 @@ void Circle::initialise() {
 	m_sprite.setOutlineColor(Color::White);
 	m_sprite.setRadius(DEFAULT_RADIUS);
 
+	m_active = false;
 	m_tweenA = nullptr;
 	m_position = m_sprite.getPosition();
 
-	initMovement();
+	stopMovement();
 }
 
-void Circle::initMovement() {
-	bool m_moveLeft = false;
-	bool m_moveRight = false;
-	bool m_moveUp = false;
-	bool m_moveDown = false;
+void Circle::stopMovement() {
+	m_moveLeft = false;
+	m_moveRight = false;
+	m_moveUp = false;
+	m_moveDown = false;
+}
+
+void Circle::handleInput(sf::Event& event) {
+	if (event.type == sf::Event::KeyPressed) {
+
+		if (event.key.code == sf::Keyboard::W) {
+			moveUp(true);
+		}
+
+		if (event.key.code == sf::Keyboard::S) {
+			moveDown(true);
+		}
+
+		if (event.key.code == sf::Keyboard::A) {
+			moveLeft(true);
+		}
+
+		if (event.key.code == sf::Keyboard::D) {
+			moveRight(true);
+		}
+	}
+
+	if (event.type == sf::Event::KeyReleased) {
+
+		if (event.key.code == sf::Keyboard::W) {
+			moveUp(false);
+		}
+
+		if (event.key.code == sf::Keyboard::S) {
+			moveDown(false);
+		}
+
+		if (event.key.code == sf::Keyboard::A) {
+			moveLeft(false);
+		}
+
+		if (event.key.code == sf::Keyboard::D) {
+			moveRight(false);
+		}
+	}
+}
+
+void Circle::setActive(bool b) {
+	m_active = b;
+}
+
+bool Circle::isActive() const {
+	return m_active;
 }
 
 /*------------------------------------------------------------
@@ -179,10 +229,12 @@ void Circle::update(float dt) {
 		m_tweenA->update(dt); 			// update position
 	}
 
-	if (m_moveUp)    m_position.y -= MOVE_SPEED * dt;
-	if (m_moveDown)  m_position.y += MOVE_SPEED * dt;
-	if (m_moveLeft)  m_position.x -= MOVE_SPEED * dt;
-	if (m_moveRight) m_position.x += MOVE_SPEED * dt;
+	if (m_active) {
+		if (m_moveUp)    m_position.y -= MOVE_SPEED * dt;
+		if (m_moveDown)  m_position.y += MOVE_SPEED * dt;
+		if (m_moveLeft)  m_position.x -= MOVE_SPEED * dt;
+		if (m_moveRight) m_position.x += MOVE_SPEED * dt;
+	}
 
 	m_sprite.setPosition(m_position);	// apply position
 }
