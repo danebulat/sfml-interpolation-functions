@@ -51,8 +51,7 @@ void Tween::start() {
 	m_isAnimating = true;
 }
 
-void Tween::stop()
-{
+void Tween::stop() {
 	m_isAnimating = false;
 }
 
