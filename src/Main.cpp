@@ -16,19 +16,185 @@ Circle makeCircle(const sf::Color& color) {
 }
 
 int EasingDemo(RenderWindow&);
+int TweenSpawnDemo(RenderWindow&);
 
 int main()
 {
     util::Platform platform;
 
-    sf::RenderWindow window(sf::VideoMode(800,600,32), "Robert Penner's Easing Equations with SFML", sf::Style::Default);
+    Vector2f resolution(800.f, 600.f);
+    sf::RenderWindow window(sf::VideoMode(resolution.x,resolution.y,32), "Robert Penner's Easing Equations with SFML", sf::Style::Default);
 
     // NOTE: Set frame rate limit in Engine
     window.setFramerateLimit(60);
 
     //return EasingDemo(window);
+    //return TweenSpawnDemo(window);
 
-    // Circle demo
+    // Camera switch demo
+    Circle player1(Vector2f(30.f, 275.f), sf::Color::Yellow, 30.f);
+
+    player1.moveUp(false);
+    player1.moveDown(false);
+    player1.moveLeft(false);
+    player1.moveRight(false);
+
+    Circle player2(Vector2f(175.f, 275.f), sf::Color::Green, 30.f);
+
+    sf::Font myfont;
+    if(!myfont.loadFromFile("content/DroidSansMono.ttf")) {
+        std::cerr << "Could not load font DroidSansMono.ttf." << std::endl;
+    }
+
+    sf::Texture backtexture;
+    if (!backtexture.loadFromFile("content/background.png"))
+        std::cerr << "Could not load texture background.png" << std::endl;
+
+    sf::Sprite background;
+    background.setTexture(backtexture);
+    background.setPosition(0,0);
+
+    sf::View hud(sf::FloatRect(0, 0, resolution.x, resolution.y));
+    sf::View view(sf::FloatRect(0, 0, resolution.x, resolution.y));
+    view.setCenter(player1.getCenter());
+
+    std::string text = ""
+        "---------------------------------------------\n\n"
+        "Controls\n"
+        "---------------------------------------------\n\n"
+        "Space:        Switch player()\n\n"
+        "---------------------------------------------";
+
+    sf::Text label(text, myfont);
+    label.setPosition(20.f, 20.f);
+    label.setCharacterSize(14);
+
+    sf::Clock clock;
+
+    while (window.isOpen())
+    {
+        sf::Time dt = clock.restart();
+
+        // Input
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            // Close window: exit
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            }
+
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::W) {
+                    player1.moveUp(true);
+                }
+                if (event.key.code == sf::Keyboard::A) {
+                    player1.moveLeft(true);
+                }
+                if (event.key.code == sf::Keyboard::S) {
+                    player1.moveDown(true);
+                }
+                if (event.key.code == sf::Keyboard::D) {
+                    player1.moveRight(true);
+                }
+            }
+
+            if (event.type == sf::Event::KeyReleased)
+            {
+                if (event.key.code == sf::Keyboard::Escape) {
+                    window.close();
+                }
+
+                // Enter key starts tween from beginning
+                if (event.key.code == sf::Keyboard::Space) {
+
+                }
+
+                if (event.key.code == sf::Keyboard::W) {
+                    player1.moveUp(false);
+                }
+                if (event.key.code == sf::Keyboard::A) {
+                    player1.moveLeft(false);
+                }
+                if (event.key.code == sf::Keyboard::S) {
+                    player1.moveDown(false);
+                }
+                if (event.key.code == sf::Keyboard::D) {
+                    player1.moveRight(false);
+                }
+            }
+        }
+
+        // Update
+        player1.update(dt.asSeconds());
+        player2.update(dt.asSeconds());
+
+        // Clamp the camera X and Y position if background scrolls off screen
+        bool clampCameraMinX = false;
+        bool clampCameraMaxX = false;
+        bool clampCameraMinY = false;
+        bool clampCameraMaxY = false;
+
+        sf::Vector2f cameraPos;
+        sf::Vector2f playerPos = player1.getCenter();
+        sf::Vector2u backgroundSize = background.getTexture()->getSize();;
+
+        float cameraMinX = resolution.x * .5f;
+        float cameraMaxX = (float)backgroundSize.x - (resolution.x * .5f);
+        float cameraMinY = resolution.y * .5f;
+        float cameraMaxY = (float)backgroundSize.y - (resolution.y * .5f);
+
+        // Set X clamp flags
+        if (playerPos.x < cameraMinX)
+            clampCameraMinX = true;
+        else if (playerPos.x > cameraMaxX)
+            clampCameraMaxX = true;
+
+        // Set Y clamp flags
+        if (playerPos.y < cameraMinY)
+            clampCameraMinY = true;
+        else if (playerPos.y > cameraMaxY)
+            clampCameraMaxY = true;
+
+        // Set camera X position
+        if (clampCameraMinX)
+            cameraPos.x = cameraMinX;
+        else if (clampCameraMaxX)
+            cameraPos.x = cameraMaxX;
+        else
+            cameraPos.x = playerPos.x;
+
+        // Set camera Y position
+        if (clampCameraMinY)
+            cameraPos.y = cameraMinY;
+        else if (clampCameraMaxY)
+            cameraPos.y = cameraMaxY;
+        else
+            cameraPos.y = playerPos.y;
+
+        // Set view center
+        view.setCenter(cameraPos);
+
+        // Draw
+        window.clear();
+        window.setView(view);
+        window.draw(background);
+        player1.draw(window);
+        player2.draw(window);
+
+        window.setView(hud);
+        window.draw(label);
+        window.display();
+    }
+
+    return 0;
+}
+
+/*------------------------------------------------------------
+ Tween spawn circle demo
+ ------------------------------------------------------------*/
+int TweenSpawnDemo(RenderWindow& window) {
     Circle circle(Vector2f(30.f, 275.f), Color::Yellow, 50.f);
     circle.createDemoTween();
 
@@ -98,6 +264,10 @@ int main()
 
     return 0;
 }
+
+/*------------------------------------------------------------
+ Easing Demo
+ ------------------------------------------------------------*/
 
 int EasingDemo(RenderWindow& window) {
     sf::Event e;

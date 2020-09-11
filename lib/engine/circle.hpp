@@ -15,12 +15,19 @@ private:
 	static const float DEFAULT_POSITION;
 	static const float DEFAULT_RADIUS;
 	static const float DEFAULT_LINE_THICKNESS;
+	static const float MOVE_SPEED;
 
 	Tween* m_tweenA;
 	Tween* m_tweenB;
 
+	bool m_moveLeft;
+	bool m_moveRight;
+	bool m_moveUp;
+	bool m_moveDown;
+
 private:
 	void initialise();
+	void initMovement();
 
 public:
 	Circle();
@@ -34,9 +41,21 @@ public:
 
 	void setPosition(const Vector2f& position);
 	void setPosition(float x, float y);
+	sf::Vector2f getCenter() const;
 
 	void update(float dt);
 	void draw(RenderWindow& window);
+
+	// Movement controls
+	void moveUp(bool b);
+	void moveDown(bool b);
+	void moveLeft(bool b);
+	void moveRight(bool b);
+
+	bool movingUp() const;
+	bool movingDown() const;
+	bool movingLeft() const;
+	bool movingRight() const;
 
 	// Tween API
 	void createDemoTween(InterpFunc func=InterpFunc::QuartEaseOut);

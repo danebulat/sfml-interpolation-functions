@@ -8,6 +8,7 @@
 const float Circle::DEFAULT_POSITION = 10.0f;
 const float Circle::DEFAULT_LINE_THICKNESS = 1.0f;
 const float Circle::DEFAULT_RADIUS = 10.0f;
+const float Circle::MOVE_SPEED = 250.0f;
 
 /*------------------------------------------------------------
   Constructors
@@ -35,6 +36,8 @@ Circle::Circle(const Vector2f& position,
 	m_sprite.setRadius(radius);
 	m_sprite.setOutlineThickness(1.f);
 	m_sprite.setOutlineColor(Color::White);
+
+	initMovement();
 }
 
 Circle::~Circle() {
@@ -55,6 +58,15 @@ void Circle::initialise() {
 
 	m_tweenA = nullptr;
 	m_position = m_sprite.getPosition();
+
+	initMovement();
+}
+
+void Circle::initMovement() {
+	bool m_moveLeft = false;
+	bool m_moveRight = false;
+	bool m_moveUp = false;
+	bool m_moveDown = false;
 }
 
 /*------------------------------------------------------------
@@ -141,12 +153,37 @@ void Circle::setPosition(float x, float y) {
 	m_sprite.setPosition(x, y);
 }
 
+sf::Vector2f Circle::getCenter() const {
+	sf::FloatRect localBounds = m_sprite.getLocalBounds();
+	float halfWidth = localBounds.width * .5f;
+	float halfHeight = localBounds.height * .5f;
+	return Vector2f(m_position.x + halfWidth, m_position.y + halfHeight);
+}
+
+void Circle::moveUp(bool b)    { m_moveUp = b; }
+void Circle::moveDown(bool b)  { m_moveDown = b; }
+void Circle::moveLeft(bool b)  { m_moveLeft = b; }
+void Circle::moveRight(bool b) { m_moveRight = b; }
+
+bool Circle::movingUp()    const { return m_moveUp; }
+bool Circle::movingDown()  const { return m_moveDown; };
+bool Circle::movingLeft()  const { return m_moveLeft; };
+bool Circle::movingRight() const { return m_moveRight; };
+
 /*------------------------------------------------------------
   Update and draw functions
   ------------------------------------------------------------ */
 
 void Circle::update(float dt) {
-	m_tweenA->update(dt);				// update position
+	if (m_tweenA != nullptr) {
+		m_tweenA->update(dt); 			// update position
+	}
+
+	if (m_moveUp)    m_position.y -= MOVE_SPEED * dt;
+	if (m_moveDown)  m_position.y += MOVE_SPEED * dt;
+	if (m_moveLeft)  m_position.x -= MOVE_SPEED * dt;
+	if (m_moveRight) m_position.x += MOVE_SPEED * dt;
+
 	m_sprite.setPosition(m_position);	// apply position
 }
 
