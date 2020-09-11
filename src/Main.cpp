@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <SFML/Graphics.hpp>
 // #include <THOR/Shapes.hpp>
 // #include <THOR/Graphics.hpp>
@@ -20,6 +21,73 @@ Circle makeCircle(const sf::Color& color) {
 int EasingDemo(RenderWindow&);
 int TweenSpawnDemo(RenderWindow&);
 
+std::string updateHUD(View& view, Circle& player,
+    std::vector<std::string>& easeFuncVec, InterpFunc interpf, float dur) {
+
+    int i = static_cast<int>(interpf);
+
+    std::stringstream ss;
+    ss << ""
+        "-----------------------------------------------\n"
+        "HUD:       Camera X  " << view.getCenter().x   << "\n"
+        "           Camera Y  " << view.getCenter().y   << "\n"
+        "           Player X: " << player.getCenter().x << "\n"
+        "           Player Y: " << player.getCenter().y << "\n\n"
+        "Selected Ease:  " << easeFuncVec[i-1]
+            << " (" << static_cast<int>(interpf) << "/" << easeFuncVec.size() << ")\n"
+        "Tween Duration: " << dur << " seconds\n"
+        "-----------------------------------------------\n";
+
+    return ss.str();
+}
+
+std::string updateControls() {
+    return ""
+           "-----------------------------------------------\n"
+           "Controls:  H           Toggle HUD\n"
+           "           Space       Switch player\n"
+           "           WASD        Move active player\n"
+           "           Up/Down     Change easing function\n"
+           "           Left/Right  Modify tween duration\n"
+           "-----------------------------------------------";
+}
+
+// Initialise 31 easing labels
+void initEaseFuncLabels(std::vector<std::string>& vec) {
+     vec = {
+        "Linear",
+        "Quad Ease In",
+        "Quad Ease Out",
+        "Quad Ease In Out",
+        "Cubic Ease In",
+        "Cubic Ease Out",
+        "Cubic Ease In Out",
+        "Quart Ease In",
+        "Quart Ease Out",
+        "Quart Ease In Out",
+        "Quint Ease In",
+        "Quint Ease Out",
+        "Quint Ease In Out",
+        "Sine Ease In",
+        "Sine Ease Out",
+        "Sine Ease In Out",
+        "Expo Ease In",
+        "Expo Ease Out",
+        "Expo Ease In Out",
+        "Circ Ease In",
+        "Circ Ease Out",
+        "Circ Ease In Out",
+        "Back Ease In",
+        "Back Ease Out",
+        "Back Ease In Out",
+        "Elastic Ease In",
+        "Elastic Ease Out",
+        "Elastic Ease In Out",
+        "Bounce Ease In",
+        "Bounce Ease Out",
+        "Bounce Ease In Out" };
+}
+
 int main()
 {
     util::Platform platform;
@@ -34,10 +102,10 @@ int main()
     //return TweenSpawnDemo(window);
 
     // Camera switch demo
-    Circle player1(Vector2f(30.f, 275.f), sf::Color::Yellow, 30.f);
+    Circle player1(Vector2f(500.f, 575.f), sf::Color::Yellow, 30.f);
     player1.setActive(true);
 
-    Circle player2(Vector2f(175.f, 275.f), sf::Color::Green, 30.f);
+    Circle player2(Vector2f(800.f, 675.f), sf::Color::Green, 30.f);
 
     sf::Font myfont;
     if(!myfont.loadFromFile("content/DroidSansMono.ttf")) {
@@ -56,17 +124,21 @@ int main()
     sf::View view(sf::FloatRect(0, 0, resolution.x, resolution.y));
     view.setCenter(player1.getCenter());
 
-    std::string text = ""
-        "---------------------------------------------\n\n"
-        "Controls\n"
-        "---------------------------------------------\n\n"
-        "Space:        Switch player()\n\n"
-        "WASD:         Move active player\n\n"
-        "---------------------------------------------";
+    sf::Text label;
+    sf::Text controlsLabel;
+    std::vector<std::string> easeFuncLabels;
+    initEaseFuncLabels(easeFuncLabels);
 
-    sf::Text label(text, myfont);
-    label.setPosition(20.f, 20.f);
-    label.setCharacterSize(14);
+    bool showHUD = true;
+
+    label.setFont(myfont);
+    label.setPosition(20.f, 1.f);
+    label.setCharacterSize(12);
+
+    controlsLabel.setFont(myfont);
+    controlsLabel.setCharacterSize(12);
+    controlsLabel.setPosition(20.f, 500.f);
+    controlsLabel.setString(updateControls());
 
     sf::Clock clock;
     bool player1Active = true;
@@ -74,7 +146,7 @@ int main()
     // ------------------------------
     // Camera tween data
     // ------------------------------
-    InterpFunc interp = InterpFunc::QuintEaseOut;
+    InterpFunc interp = InterpFunc::ElasticEaseOut;
     float  tdur   = .5f;
     Tween* tweenX = nullptr;
     Tween* tweenY = nullptr;
@@ -111,6 +183,35 @@ int main()
             {
                 if (event.key.code == sf::Keyboard::Escape) {
                     window.close();
+                }
+
+                if (event.key.code == sf::Keyboard::Up) {
+                    int i = static_cast<int>(interp);
+                    if (++i <= 31)
+                        interp = static_cast<InterpFunc>(i);
+                    else
+                        interp = static_cast<InterpFunc>(1);
+                }
+
+                if (event.key.code == sf::Keyboard::Down) {
+                    int i = static_cast<int>(interp);
+                    if (--i >= 1)
+                        interp = static_cast<InterpFunc>(i);
+                    else
+                        interp = static_cast<InterpFunc>(31);
+                }
+
+                if (event.key.code == sf::Keyboard::Right) {
+                    tdur += .1f;
+                }
+
+                if (event.key.code == sf::Keyboard::Left) {
+                    tdur -= .1f;
+                    if (tdur < 0.2f) tdur = .2f;
+                }
+
+                if (event.key.code == sf::Keyboard::H) {
+                    showHUD = !showHUD;
                 }
 
                 // SPACE
@@ -273,6 +374,9 @@ int main()
             view.setCenter(cameraPos);
         }
 
+        player1Active ? label.setString(updateHUD(view, player1, easeFuncLabels, interp, tdur)) :
+                        label.setString(updateHUD(view, player2, easeFuncLabels, interp, tdur));
+
         // Draw
         window.clear();
         window.setView(view);
@@ -280,8 +384,12 @@ int main()
         player1.draw(window);
         player2.draw(window);
 
-        window.setView(hud);
-        window.draw(label);
+        if (showHUD) {
+            window.setView(hud);
+            window.draw(label);
+            window.draw(controlsLabel);
+        }
+
         window.display();
     }
 
