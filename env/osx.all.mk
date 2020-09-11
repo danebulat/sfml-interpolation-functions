@@ -23,8 +23,8 @@ PRODUCTION_DEPENDENCIES := \
 	$(PRODUCTION_DEPENDENCIES)
 
 PRODUCTION_MACOS_BUNDLE_DEVELOPER := developer
-PRODUCTION_MACOS_BUNDLE_DISPLAY_NAME := SFML Boilerplate
-PRODUCTION_MACOS_BUNDLE_NAME := SFML Boilerplate
+PRODUCTION_MACOS_BUNDLE_DISPLAY_NAME := Camera Interpolation Demo
+PRODUCTION_MACOS_BUNDLE_NAME := Camera Interpolation Demo
 PRODUCTION_MACOS_MAKE_DMG := true
 PRODUCTION_MACOS_BACKGROUND := dmg-background
 
@@ -36,4 +36,12 @@ PRODUCTION_MACOS_DYLIBS := \
 	/usr/local/lib/libsfml-system.2.5
 
 # Path, no extension (eg. /Library/Frameworks/ogg)
-PRODUCTION_MACOS_FRAMEWORKS :=
+PRODUCTION_MACOS_FRAMEWORKS := \
+	/Library/Frameworks/freetype \
+	/Library/Frameworks/FLAC \
+	/Library/Frameworks/OpenAL \
+	/Library/Frameworks/freetype \
+	/Library/Frameworks/ogg \
+	/Library/Frameworks/vorbis \
+	/Library/Frameworks/vorbisenc \
+	/Library/Frameworks/vorbisfile

@@ -1,5 +1,5 @@
-#include "engine/circle.hpp"
 #include "engine/utils.hpp"
+#include "engine/circle.hpp"
 
 /*------------------------------------------------------------
   Static member initialisation

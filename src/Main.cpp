@@ -52,42 +52,6 @@ std::string updateControls() {
            "-----------------------------------------------";
 }
 
-// Initialise 31 easing labels
-void initEaseFuncLabels(std::vector<std::string>& vec) {
-     vec = {
-        "Linear",
-        "Quad Ease In",
-        "Quad Ease Out",
-        "Quad Ease In Out",
-        "Cubic Ease In",
-        "Cubic Ease Out",
-        "Cubic Ease In Out",
-        "Quart Ease In",
-        "Quart Ease Out",
-        "Quart Ease In Out",
-        "Quint Ease In",
-        "Quint Ease Out",
-        "Quint Ease In Out",
-        "Sine Ease In",
-        "Sine Ease Out",
-        "Sine Ease In Out",
-        "Expo Ease In",
-        "Expo Ease Out",
-        "Expo Ease In Out",
-        "Circ Ease In",
-        "Circ Ease Out",
-        "Circ Ease In Out",
-        "Back Ease In",
-        "Back Ease Out",
-        "Back Ease In Out",
-        "Elastic Ease In",
-        "Elastic Ease Out",
-        "Elastic Ease In Out",
-        "Bounce Ease In",
-        "Bounce Ease Out",
-        "Bounce Ease In Out" };
-}
-
 int main()
 {
     util::Platform platform;
@@ -103,9 +67,8 @@ int main()
 
     // Camera switch demo
     Circle player1(Vector2f(500.f, 575.f), sf::Color::Yellow, 30.f);
-    player1.setActive(true);
-
     Circle player2(Vector2f(800.f, 675.f), sf::Color::Green, 30.f);
+    player1.setActive(true);
 
     sf::Font myfont;
     if(!myfont.loadFromFile("content/DroidSansMono.ttf")) {
@@ -126,8 +89,8 @@ int main()
 
     sf::Text label;
     sf::Text controlsLabel;
-    std::vector<std::string> easeFuncLabels;
-    initEaseFuncLabels(easeFuncLabels);
+    std::vector<std::string> easingLabels;
+    demo::initEasingLabels(easingLabels);
 
     bool showHUD = true;
 
@@ -137,8 +100,9 @@ int main()
 
     controlsLabel.setFont(myfont);
     controlsLabel.setCharacterSize(12);
-    controlsLabel.setPosition(20.f, 500.f);
     controlsLabel.setString(updateControls());
+    controlsLabel.setPosition(20.f, resolution.y -
+        controlsLabel.getLocalBounds().height - 10.f);
 
     sf::Clock clock;
     bool player1Active = true;
@@ -374,8 +338,8 @@ int main()
             view.setCenter(cameraPos);
         }
 
-        player1Active ? label.setString(updateHUD(view, player1, easeFuncLabels, interp, tdur)) :
-                        label.setString(updateHUD(view, player2, easeFuncLabels, interp, tdur));
+        player1Active ? label.setString(updateHUD(view, player1, easingLabels, interp, tdur)) :
+                        label.setString(updateHUD(view, player2, easingLabels, interp, tdur));
 
         // Draw
         window.clear();
