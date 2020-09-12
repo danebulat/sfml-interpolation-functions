@@ -124,12 +124,22 @@ void Camera::clampTo(const sf::Vector2u& backgroundSize,
 	calculateMinMaxPos(backgroundSize, resolution);
 }
 
+void Camera::incrementDuration(float i) {
+	m_duration += i;
+	if (m_duration < .2f)
+		m_duration = .2f;
+}
+
 // ----------------------------------------------------------------------
 // Accessors
 // ----------------------------------------------------------------------
 
 void Camera::setInterpolation(InterpFunc interp) {
 	m_interpolation = interp;
+}
+
+InterpFunc Camera::getInterpolation() const {
+	return m_interpolation;
 }
 
 Vector2f Camera::getPosition() const {
@@ -202,29 +212,34 @@ void Camera::update(float dt, const Circle& player) {
 				cameraY = m_maxY;
 			else
 				cameraY = m_position.y;
+
+			m_position.x = cameraX;
+			m_position.y = cameraY;
 		}
 	}
 
 	// Update camera position based on the player if it's not animating
-	float playerX = player.getCenter().x;
-	float playerY = player.getCenter().y;
+	if (!m_tweenXActive && !m_tweenYActive) {
+		float playerX = player.getCenter().x;
+		float playerY = player.getCenter().y;
 
-	bool clampOnMinX = false;
-	bool clampOnMaxX = false;
-	bool clampOnMinY = false;
-	bool clampOnMaxY = false;
+		bool clampOnMinX = false;
+		bool clampOnMaxX = false;
+		bool clampOnMinY = false;
+		bool clampOnMaxY = false;
 
-	if (playerX < m_minX)      clampOnMinX = true;
-	else if (playerX > m_maxX) clampOnMaxX = true;
+		if (playerX < m_minX)      clampOnMinX = true;
+		else if (playerX > m_maxX) clampOnMaxX = true;
 
-	if (playerY < m_minY)	   clampOnMinY = true;
-	else if (playerY > m_maxY) clampOnMaxY = true;
+		if (playerY < m_minY)	   clampOnMinY = true;
+		else if (playerY > m_maxY) clampOnMaxY = true;
 
-	if (clampOnMinX)      m_position.x = m_minX;
-	else if (clampOnMaxX) m_position.x = m_maxX;
-	else 				  m_position.x = playerX;
+		if (clampOnMinX)      m_position.x = m_minX;
+		else if (clampOnMaxX) m_position.x = m_maxX;
+		else 				  m_position.x = playerX;
 
-	if (clampOnMinY) 	  m_position.y = m_minY;
-	else if (clampOnMaxY) m_position.y = m_maxY;
-	else 				  m_position.y = playerY;
+		if (clampOnMinY) 	  m_position.y = m_minY;
+		else if (clampOnMaxY) m_position.y = m_maxY;
+		else 				  m_position.y = playerY;
+	}
 }

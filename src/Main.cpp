@@ -1,13 +1,14 @@
 #include <iostream>
 #include <sstream>
 #include <SFML/Graphics.hpp>
+#include "Platform/Platform.hpp"
 // #include <THOR/Shapes.hpp>
 // #include <THOR/Graphics.hpp>
 #include "engine/button.hpp"
 #include "engine/circle.hpp"
-#include "Platform/Platform.hpp"
 #include "engine/interpolate.hpp"
 #include "engine/tween.hpp"
+#include "engine/camera.hpp"
 #include "engine/utils.hpp"
 
 #include <cmath>
@@ -78,24 +79,12 @@ int main()
     bool player1Active = true;
 
     // ------------------------------
-    // Camera tween data
+    // Camera
     // ------------------------------
-    InterpFunc interp = InterpFunc::ElasticEaseOut;
-    float  tdur   = .5f;
-    Tween* tweenX = nullptr;
-    Tween* tweenY = nullptr;
-
-    float  propertyX = 0.f;
-    float  propertyY = 0.f;
-
-    bool   tweenXActive = false;
-    bool   tweenYActive = false;
-
-    sf::Vector2u backgroundSize = background.getTexture()->getSize();
-    float cameraMinX = resolution.x * .5f;
-    float cameraMaxX = (float)backgroundSize.x - (resolution.x * .5f);
-    float cameraMinY = resolution.y * .5f;
-    float cameraMaxY = (float)backgroundSize.y - (resolution.y * .5f);
+    Camera camera(player1.getCenter(), background.getTexture()->getSize(),
+        resolution, true);
+    camera.setDuration(.5f);
+    camera.setInterpolation(InterpFunc::ElasticEaseOut);
 
     while (window.isOpen())
     {
@@ -120,28 +109,27 @@ int main()
                 }
 
                 if (event.key.code == sf::Keyboard::Up) {
-                    int i = static_cast<int>(interp);
+                    int i = static_cast<int>(camera.getInterpolation());
                     if (++i <= 31)
-                        interp = static_cast<InterpFunc>(i);
+                        camera.setInterpolation(static_cast<InterpFunc>(i));
                     else
-                        interp = static_cast<InterpFunc>(1);
+                        camera.setInterpolation(static_cast<InterpFunc>(1));
                 }
 
                 if (event.key.code == sf::Keyboard::Down) {
-                    int i = static_cast<int>(interp);
+                    int i = static_cast<int>(camera.getInterpolation());
                     if (--i >= 1)
-                        interp = static_cast<InterpFunc>(i);
+                        camera.setInterpolation(static_cast<InterpFunc>(i));
                     else
-                        interp = static_cast<InterpFunc>(31);
+                        camera.setInterpolation(static_cast<InterpFunc>(31));
                 }
 
                 if (event.key.code == sf::Keyboard::Right) {
-                    tdur += .1f;
+                    camera.incrementDuration(.1f);
                 }
 
                 if (event.key.code == sf::Keyboard::Left) {
-                    tdur -= .1f;
-                    if (tdur < 0.2f) tdur = .2f;
+                    camera.incrementDuration(-.1f);
                 }
 
                 if (event.key.code == sf::Keyboard::H) {
@@ -152,60 +140,18 @@ int main()
                 if (event.key.code == sf::Keyboard::Space) {
 
                     // Switch player only if the tween is NOT active
-                    if (!tweenXActive && !tweenYActive) {
+                    if (!camera.isAnimating()) {
 
                         // Determine which player to switch to
                         if (player1Active) {
                             player1.setActive(false);
                             player2.setActive(true);
-
-                            // Spawn X tween
-                            tweenXActive = true;
-                            propertyX = player1.getCenter().x;  // cache initial property value
-
-                            float targetX = player2.getCenter().x;
-                            if (targetX < cameraMinX) targetX = cameraMinX;
-                            if (targetX > cameraMaxX) targetX = cameraMaxX;
-
-                            tweenX = new Tween(&propertyX, propertyX, targetX, tdur, interp);
-                            tweenX->start();
-
-                            // Spawn Y tween
-                            tweenYActive = true;
-                            propertyY = player1.getCenter().y;  // cache initial property value
-
-                            float targetY = player2.getCenter().y;
-                            if (targetY < cameraMinY) targetY = cameraMinY;
-                            if (targetY > cameraMaxX) targetY = cameraMaxY;
-
-                            tweenY = new Tween(&propertyY, propertyY, targetY, tdur, interp);
-                            tweenY->start();
+                            camera.animateTo(player2.getCenter());
                         }
                         else {
                             player1.setActive(true);
                             player2.setActive(false);
-
-                            // Spawn X tween
-                            tweenXActive = true;
-                            propertyX = player2.getCenter().x;  // cache initial property value
-
-                            float targetX = player1.getCenter().x;
-                            if (targetX < cameraMinX) targetX = cameraMinX;
-                            if (targetX > cameraMaxX) targetX = cameraMaxX;
-
-                            tweenX = new Tween(&propertyX, propertyX, targetX, tdur, interp);
-                            tweenX->start();
-
-                            // Spawn Y tween
-                            tweenYActive = true;
-                            propertyY = player2.getCenter().y;  // cache initial property value
-
-                            float targetY = player1.getCenter().y;
-                            if (targetY < cameraMinY) targetY = cameraMinY;
-                            if (targetY > cameraMaxX) targetY = cameraMaxY;
-
-                            tweenY = new Tween(&propertyY, propertyY, targetY, tdur, interp);
-                            tweenY->start();
+                            camera.animateTo(player1.getCenter());
                         }
 
                         player1Active = !player1Active;
@@ -218,98 +164,26 @@ int main()
         // Update
         // ----------------------------------------------------------------------
 
-        // Deallocate tweens if it has finished animating, otherwise call update()
-        if (tweenXActive && (!tweenX->m_isAnimating)) {
-            tweenXActive = false;
-            SafeDelete(tweenX);
-        }
-        else if (tweenXActive) {
-            tweenX->update(dt.asSeconds());
-        }
-
-        if (tweenYActive && (!tweenY->m_isAnimating)) {
-            tweenYActive = false;
-            SafeDelete(tweenY);
-        }
-        else if (tweenYActive) {
-            tweenY->update(dt.asSeconds());
-        }
-
-        // Update camera position via the tweens updated values
-        if (tweenXActive || tweenYActive) {
-            float cameraX = 0.f;
-            float cameraY = 0.f;
-
-            // Clamp X if background goes of screen
-            if (propertyX < cameraMinX)
-                cameraX = cameraMinX;
-            else if (propertyX > cameraMaxX)
-                cameraX = cameraMaxX;
-            else
-                cameraX = propertyX;
-
-            // Clamp Y if background goes of screen
-            if (propertyY < cameraMinY)
-                cameraY = cameraMinY;
-            else if (propertyY > cameraMaxY)
-                cameraY = cameraMaxY;
-            else
-                cameraY = propertyY;
-
-            view.setCenter(cameraX, cameraY);
-        }
-
-        // Camera is currently animating if the tween is active
-        if (!tweenXActive && !tweenYActive)
-        {
+        // Update the active player position if camera is not animating
+        if (!camera.isAnimating()) {
             player1.update(dt.asSeconds());
             player2.update(dt.asSeconds());
-
-            // Clamp the camera X and Y position if background scrolls off screen
-            bool clampCameraMinX = false;
-            bool clampCameraMaxX = false;
-            bool clampCameraMinY = false;
-            bool clampCameraMaxY = false;
-
-            sf::Vector2f cameraPos;     // camera position for this frame
-            sf::Vector2f playerPos;     // position of the active player
-
-            player1Active ? playerPos = player1.getCenter() : playerPos = player2.getCenter();
-
-            // Set X clamp flags
-            if (playerPos.x < cameraMinX)
-                clampCameraMinX = true;
-            else if (playerPos.x > cameraMaxX)
-                clampCameraMaxX = true;
-
-            // Set Y clamp flags
-            if (playerPos.y < cameraMinY)
-                clampCameraMinY = true;
-            else if (playerPos.y > cameraMaxY)
-                clampCameraMaxY = true;
-
-            // Set camera X position
-            if (clampCameraMinX)
-                cameraPos.x = cameraMinX;
-            else if (clampCameraMaxX)
-                cameraPos.x = cameraMaxX;
-            else
-                cameraPos.x = playerPos.x;
-
-            // Set camera Y position
-            if (clampCameraMinY)
-                cameraPos.y = cameraMinY;
-            else if (clampCameraMaxY)
-                cameraPos.y = cameraMaxY;
-            else
-                cameraPos.y = playerPos.y;
-
-            // Set view center
-            view.setCenter(cameraPos);
         }
 
-        player1Active ? label.setString(updateHUD(view, player1, easingLabels, interp, tdur)) :
-                        label.setString(updateHUD(view, player2, easingLabels, interp, tdur));
+        // Update camera (make it follow the player or animate to the active player)
+        if (player1Active) {
+            camera.update(dt.asSeconds(), player1);
+            label.setString(updateHUD(view, player1, easingLabels,
+                camera.getInterpolation(), camera.getDuration()));
+        }
+        else {
+            camera.update(dt.asSeconds(), player2);
+            label.setString(updateHUD(view, player2, easingLabels,
+                camera.getInterpolation(), camera.getDuration()));
+        }
+
+        // Center view on camera's position
+        view.setCenter(camera.getPosition());
 
         // Draw
         window.clear();
@@ -326,9 +200,6 @@ int main()
 
         window.display();
     }
-
-    SafeDelete(tweenX);
-    SafeDelete(tweenY);
 
     return 0;
 }

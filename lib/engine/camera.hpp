@@ -68,14 +68,15 @@ public:
 	/** Public API
 	*/
 	void animateTo(const sf::Vector2f& target);
-	void clampTo(const sf::Vector2u& backgroundSize,
-			     const sf::Vector2f& resolution);
+	void clampTo(const sf::Vector2u& backgroundSize, const sf::Vector2f& resolution);
 	bool isAnimating() const;
 	void update(float dt, const Circle& player);
+	void incrementDuration(float i);
 
 	/** Accessors
 	*/
 	void setInterpolation(InterpFunc interp);
+	InterpFunc getInterpolation() const;
 
 	sf::Vector2f getPosition() const;
 	void setPosition(const sf::Vector2f& pos);
