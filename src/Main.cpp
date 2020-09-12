@@ -13,6 +13,7 @@
 #include <cmath>
 
 using namespace animation;
+using namespace demo::camera;
 
 Circle makeCircle(const sf::Color& color) {
     return Circle(color);
@@ -21,43 +22,12 @@ Circle makeCircle(const sf::Color& color) {
 int EasingDemo(RenderWindow&);
 int TweenSpawnDemo(RenderWindow&);
 
-std::string updateHUD(View& view, Circle& player,
-    std::vector<std::string>& easeFuncVec, InterpFunc interpf, float dur) {
-
-    int i = static_cast<int>(interpf);
-
-    std::stringstream ss;
-    ss << ""
-        "-----------------------------------------------\n"
-        "HUD:       Camera X  " << view.getCenter().x   << "\n"
-        "           Camera Y  " << view.getCenter().y   << "\n"
-        "           Player X: " << player.getCenter().x << "\n"
-        "           Player Y: " << player.getCenter().y << "\n\n"
-        "Selected Ease:  " << easeFuncVec[i-1]
-            << " (" << static_cast<int>(interpf) << "/" << easeFuncVec.size() << ")\n"
-        "Tween Duration: " << dur << " seconds\n"
-        "-----------------------------------------------\n";
-
-    return ss.str();
-}
-
-std::string updateControls() {
-    return ""
-           "-----------------------------------------------\n"
-           "Controls:  H           Toggle HUD\n"
-           "           Space       Switch player\n"
-           "           WASD        Move active player\n"
-           "           Up/Down     Change easing function\n"
-           "           Left/Right  Modify tween duration\n"
-           "-----------------------------------------------";
-}
-
 int main()
 {
     util::Platform platform;
 
     Vector2f resolution(800.f, 600.f);
-    sf::RenderWindow window(sf::VideoMode(resolution.x,resolution.y,32), "Robert Penner's Easing Equations with SFML", sf::Style::Default);
+    sf::RenderWindow window(sf::VideoMode(resolution.x,resolution.y,32), "Camera Animation Using Easing Functions With SFML", sf::Style::Default);
 
     // NOTE: Set frame rate limit in Engine
     window.setFramerateLimit(60);
@@ -90,7 +60,7 @@ int main()
     sf::Text label;
     sf::Text controlsLabel;
     std::vector<std::string> easingLabels;
-    demo::initEasingLabels(easingLabels);
+    initEasingLabels(easingLabels);
 
     bool showHUD = true;
 
@@ -100,7 +70,7 @@ int main()
 
     controlsLabel.setFont(myfont);
     controlsLabel.setCharacterSize(12);
-    controlsLabel.setString(updateControls());
+    controlsLabel.setString(getControlsString());
     controlsLabel.setPosition(20.f, resolution.y -
         controlsLabel.getLocalBounds().height - 10.f);
 
