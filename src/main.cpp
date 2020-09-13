@@ -20,8 +20,11 @@ Circle makeCircle(const sf::Color& color) {
     return Circle(color);
 }
 
-int EasingDemo(RenderWindow&);
-int TweenSpawnDemo(RenderWindow&);
+void CameraDemo(RenderWindow&, const Vector2f&);
+void EasingDemo(RenderWindow&, const Vector2f&);
+void TweenSpawnDemo(RenderWindow&, const Vector2f&);
+
+unsigned int current_demo = 3;
 
 int main()
 {
@@ -33,8 +36,29 @@ int main()
     // NOTE: Set frame rate limit in Engine
     window.setFramerateLimit(60);
 
-    //return EasingDemo(window);
-    //return TweenSpawnDemo(window);
+    while (current_demo != 0) {
+        switch (current_demo) {
+        case 1:
+            EasingDemo(window, resolution);
+            break;
+
+        case 2:
+            TweenSpawnDemo(window, resolution);
+            break;
+
+        case 3:
+            CameraDemo(window, resolution);
+            break;
+        }
+    }
+
+    return 0;
+}
+
+/*------------------------------------------------------------
+ Camera demo
+ ------------------------------------------------------------*/
+void CameraDemo(RenderWindow& window, const Vector2f& resolution) {
 
     // Camera switch demo
     Circle player1(Vector2f(500.f, 575.f), sf::Color::Yellow, 30.f);
@@ -75,6 +99,33 @@ int main()
     controlsLabel.setPosition(20.f, resolution.y -
         controlsLabel.getLocalBounds().height - 10.f);
 
+    /* Easing Demo Button */
+    float btnX = resolution.x - 100.f;
+    float btnY = resolution.y - 100.f;
+
+    gui::button btnEasingDemo("Easing Demo #1", myfont, Vector2f(btnX, btnY), gui::style::clean);
+    btnEasingDemo.setSize(14);
+    btnEasingDemo.setLabelOffset(Vector2f(0.f, 5.f));
+    btnEasingDemo.makeActive(true);
+    btnEasingDemo.setBorderThickness(1.f);
+    btnEasingDemo.setBorderColor(sf::Color::White);
+
+    btnY += 40.f;
+    gui::button btnCircleDemo("Easing Demo #2", myfont, Vector2f(btnX, btnY), gui::style::clean);
+    btnCircleDemo.setSize(14);
+    btnCircleDemo.setLabelOffset(Vector2f(0.f, 5.f));
+    btnCircleDemo.makeActive(true);
+    btnCircleDemo.setBorderThickness(1.f);
+    btnCircleDemo.setBorderColor(sf::Color::White);
+
+    btnY += 40.f;
+    gui::button btnCameraDemo("Easing Demo #3", myfont, Vector2f(btnX, btnY), gui::style::none);
+    btnCameraDemo.setSize(14);
+    btnCameraDemo.setLabelOffset(Vector2f(0.f, 5.f));
+    btnCameraDemo.makeActive(true);
+    btnCameraDemo.setBorderThickness(1.f);
+    btnCameraDemo.setBorderColor(sf::Color::White);
+
     sf::Clock clock;
     bool player1Active = true;
 
@@ -86,6 +137,9 @@ int main()
     camera.setDuration(.5f);
     camera.setInterpolation(InterpFunc::ElasticEaseOut);
 
+    bool doClickDemo1 = false;
+    bool doClickDemo2 = false;
+
     while (window.isOpen())
     {
         sf::Time dt = clock.restart();
@@ -96,6 +150,7 @@ int main()
         {
             // Close window: exit
             if (event.type == sf::Event::Closed) {
+                current_demo = 0;
                 window.close();
             }
 
@@ -105,6 +160,7 @@ int main()
             if (event.type == sf::Event::KeyReleased)
             {
                 if (event.key.code == sf::Keyboard::Escape) {
+                    current_demo = 0;
                     window.close();
                 }
 
@@ -164,6 +220,35 @@ int main()
         // Update
         // ----------------------------------------------------------------------
 
+        // Update buttons
+        btnEasingDemo.update(event, window);
+        btnCircleDemo.update(event, window);
+        btnCameraDemo.update(event, window);
+
+        if(btnEasingDemo.getState() == gui::state::active) {
+            btnEasingDemo.setActive(false);
+            if (doClickDemo1) {
+                doClickDemo1 = false;
+                current_demo = 1;
+                std::cout << "> clicked\n";
+            }
+        }
+        else {
+            doClickDemo1 = true;
+        }
+
+        if (btnCircleDemo.getState() == gui::state::active) {
+            btnCircleDemo.setActive(false);
+            if (doClickDemo2) {
+                doClickDemo2 = false;
+                current_demo = 2;
+                std::cout << "> clicked\n";
+            }
+        }
+        else {
+            doClickDemo2 = true;
+        }
+
         // Update the active player position if camera is not animating
         if (!camera.isAnimating()) {
             player1.update(dt.asSeconds());
@@ -192,22 +277,29 @@ int main()
         player1.draw(window);
         player2.draw(window);
 
+        window.setView(hud);
+
         if (showHUD) {
-            window.setView(hud);
             window.draw(label);
             window.draw(controlsLabel);
         }
 
-        window.display();
-    }
+        window.draw(btnEasingDemo);
+        window.draw(btnCircleDemo);
+        window.draw(btnCameraDemo);
 
-    return 0;
+        window.display();
+
+        // Switch to another demo?
+        if (current_demo != 3)
+            break;
+    }
 }
 
 /*------------------------------------------------------------
  Tween spawn circle demo
  ------------------------------------------------------------*/
-int TweenSpawnDemo(RenderWindow& window) {
+void TweenSpawnDemo(RenderWindow& window, const Vector2f& resolution) {
     Circle circle(Vector2f(30.f, 275.f), Color::Yellow, 50.f);
     circle.createDemoTween();
 
@@ -231,6 +323,36 @@ int TweenSpawnDemo(RenderWindow& window) {
     label.setPosition(20.f, 20.f);
     label.setCharacterSize(14);
 
+    /* Easing Demo Button */
+    float btnX = resolution.x - 100.f;
+    float btnY = resolution.y - 100.f;
+
+    gui::button btnEasingDemo("Easing Demo #1", myfont, Vector2f(btnX, btnY), gui::style::clean);
+    btnEasingDemo.setSize(14);
+    btnEasingDemo.setLabelOffset(Vector2f(0.f, 5.f));
+    btnEasingDemo.makeActive(true);
+    btnEasingDemo.setBorderThickness(1.f);
+    btnEasingDemo.setBorderColor(sf::Color::White);
+
+    btnY += 40.f;
+    gui::button btnCircleDemo("Easing Demo #2", myfont, Vector2f(btnX, btnY), gui::style::none);
+    btnCircleDemo.setSize(14);
+    btnCircleDemo.setLabelOffset(Vector2f(0.f, 5.f));
+    btnCircleDemo.makeActive(true);
+    btnCircleDemo.setBorderThickness(1.f);
+    btnCircleDemo.setBorderColor(sf::Color::White);
+
+    btnY += 40.f;
+    gui::button btnCameraDemo("Easing Demo #3", myfont, Vector2f(btnX, btnY), gui::style::clean);
+    btnCameraDemo.setSize(14);
+    btnCameraDemo.setLabelOffset(Vector2f(0.f, 5.f));
+    btnCameraDemo.makeActive(true);
+    btnCameraDemo.setBorderThickness(1.f);
+    btnCameraDemo.setBorderColor(sf::Color::White);
+
+    bool doClickDemo1 = false;
+    bool doClickDemo3 = false;
+
     while (window.isOpen())
     {
         sf::Time dt = clock.restart();
@@ -241,12 +363,14 @@ int TweenSpawnDemo(RenderWindow& window) {
         {
             // Close window: exit
             if (event.type == sf::Event::Closed) {
+                current_demo = 0;
                 window.close();
             }
 
             if (event.type == sf::Event::KeyReleased)
             {
                 if (event.key.code == sf::Keyboard::Escape) {
+                    current_demo = 0;
                     window.close();
                 }
 
@@ -266,29 +390,70 @@ int TweenSpawnDemo(RenderWindow& window) {
         }
 
         // Update
+        // Update buttons
+        btnEasingDemo.update(event, window);
+        btnCircleDemo.update(event, window);
+        btnCameraDemo.update(event, window);
+
+        if(btnEasingDemo.getState() == gui::state::active) {
+            btnEasingDemo.setActive(false);
+            if (doClickDemo1) {
+                doClickDemo1 = false;
+                current_demo = 1;
+                std::cout << "> clicked\n";
+            }
+        }
+        else {
+            doClickDemo1 = true;
+        }
+
+        if (btnCameraDemo.getState() == gui::state::active) {
+            btnCameraDemo.setActive(false);
+            if (doClickDemo3) {
+                doClickDemo3 = false;
+                current_demo = 3;
+                std::cout << "> clicked\n";
+            }
+        }
+        else {
+            doClickDemo3 = true;
+        }
+
+
         circle.update(dt.asSeconds());
 
         // Draw
         window.clear();
         circle.draw(window);
         window.draw(label);
+        window.draw(btnEasingDemo);
+        window.draw(btnCircleDemo);
+        window.draw(btnCameraDemo);
         window.display();
-    }
 
-    return 0;
+        // Switch to another demo?
+        if (current_demo != 2) {
+            break;
+        }
+    }
 }
 
 /*------------------------------------------------------------
  Easing Demo
  ------------------------------------------------------------*/
 
-int EasingDemo(RenderWindow& window) {
+void EasingDemo(RenderWindow& window, const Vector2f& resolution) {
     sf::Event e;
     bool running = true;
 
     sf::Font myfont;
     if(!myfont.loadFromFile("content/contb.ttf")) {
         std::cerr<<"Could not load your font contb.ttf."<<std::endl;
+    }
+
+    sf::Font myfontB;
+    if(!myfontB.loadFromFile("content/DroidSansMono.ttf")) {
+        std::cerr << "Could not load font DroidSansMono.ttf." << std::endl;
     }
 
     //set up a canvas to showcase the easing
@@ -358,6 +523,36 @@ int EasingDemo(RenderWindow& window) {
 
     sf::Time TimePerFrame = sf::seconds(1.f/60.f);
 
+    /* Easing Demo Button */
+    float btnX = resolution.x - 100.f;
+    float btnY = resolution.y - 100.f;
+
+    gui::button btnEasingDemo("Easing Demo #1", myfontB, Vector2f(btnX, btnY), gui::style::none);
+    btnEasingDemo.setSize(14);
+    btnEasingDemo.setLabelOffset(Vector2f(0.f, 5.f));
+    btnEasingDemo.makeActive(true);
+    btnEasingDemo.setBorderThickness(1.f);
+    btnEasingDemo.setBorderColor(sf::Color::White);
+
+    btnY += 40.f;
+    gui::button btnCircleDemo("Easing Demo #2", myfontB, Vector2f(btnX, btnY), gui::style::clean);
+    btnCircleDemo.setSize(14);
+    btnCircleDemo.setLabelOffset(Vector2f(0.f, 5.f));
+    btnCircleDemo.makeActive(true);
+    btnCircleDemo.setBorderThickness(1.f);
+    btnCircleDemo.setBorderColor(sf::Color::White);
+
+    btnY += 40.f;
+    gui::button btnCameraDemo("Easing Demo #3", myfontB, Vector2f(btnX, btnY), gui::style::clean);
+    btnCameraDemo.setSize(14);
+    btnCameraDemo.setLabelOffset(Vector2f(0.f, 5.f));
+    btnCameraDemo.makeActive(true);
+    btnCameraDemo.setBorderThickness(1.f);
+    btnCameraDemo.setBorderColor(sf::Color::White);
+
+    bool doClickDemo2 = false;
+    bool doClickDemo3 = false;
+
     while(running)
     {
         while(window.pollEvent(e))
@@ -380,8 +575,8 @@ int EasingDemo(RenderWindow& window) {
 
             if(e.type == sf::Event::Closed)
             {
+                current_demo = 0;
                 window.close();
-                return 0;
             }
 
             if(e.type == sf::Event::KeyPressed)
@@ -390,8 +585,8 @@ int EasingDemo(RenderWindow& window) {
                 {
                 case sf::Keyboard::Escape:
                 {
+                    current_demo = 0;
                     window.close();
-                    return 0;
                 }
                 break;
 
@@ -420,6 +615,35 @@ int EasingDemo(RenderWindow& window) {
                 circle_elastic.setPosition(140.f, 414.f);
                 circle_bounce.setPosition(140.f, 450.f);
             }
+        }
+
+        // Update demo buttons
+        btnEasingDemo.update(e, window);
+        btnCircleDemo.update(e, window);
+        btnCameraDemo.update(e, window);
+
+        if(btnCircleDemo.getState() == gui::state::active) {
+            btnCircleDemo.setActive(false);
+            if (doClickDemo2) {
+                doClickDemo2 = false;
+                current_demo = 2;
+                std::cout << "> clicked\n";
+            }
+        }
+        else {
+            doClickDemo2 = true;
+        }
+
+        if (btnCameraDemo.getState() == gui::state::active) {
+            btnCameraDemo.setActive(false);
+            if (doClickDemo3) {
+                doClickDemo3 = false;
+                current_demo = 3;
+                std::cout << "> clicked\n";
+            }
+        }
+        else {
+            doClickDemo3 = true;
         }
 
         //perform updates
@@ -479,17 +703,6 @@ int EasingDemo(RenderWindow& window) {
                 /* Ease-Out Functions */
                 if(duration.asSeconds() < dur)  // Call interpolation function if duration is less than x second
                 {
-                    // float elapsedTime = duration.asSeconds();
-                    // float xPos = Interpolate::easeOutBounce(
-                    //                 elapsedTime,            // Same unit as total time (d), the starting time
-                    //                 140.0f,                 // The beginning value of the property that we're animating
-                    //                 160.0f,                 // The change between the beginning and destination value of the property.
-                    //                 1.f);                   // Total time of the tween
-                    //
-                    // std::cout << "xPos: " << xPos << "\tduration: " << duration.asSeconds() << std::endl;
-                    // std::cout.flush();
-                    // circle_linear.setPosition(xPos, 170.0f);
-
                     float t = duration.asSeconds();
 
                     circle_linear.setPosition(Interpolate::linear(t, 140.f, changeX, dur), 90.f);
@@ -553,8 +766,14 @@ int EasingDemo(RenderWindow& window) {
         circle_elastic.draw(window);
         circle_bounce.draw(window);
 
-        window.display();
-    }
+        window.draw(btnEasingDemo);
+        window.draw(btnCircleDemo);
+        window.draw(btnCameraDemo);
 
-    return 0;
+        window.display();
+
+        // Switch to another demo?
+        if (current_demo != 1)
+            break;
+    }
 }

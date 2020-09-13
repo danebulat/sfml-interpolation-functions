@@ -59,6 +59,7 @@ void Circle::initialise() {
 
 	m_active = false;
 	m_tweenA = nullptr;
+	m_tweenB = nullptr;
 	m_position = m_sprite.getPosition();
 
 	stopMovement();
