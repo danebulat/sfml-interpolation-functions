@@ -174,7 +174,7 @@ bool Camera::isAnimating() const {
 void Camera::update(float dt, const Circle& player) {
 
 	// Deallocate tweens if it has finished animating, otherwise call update()
-	if (m_tweenXActive && (!m_tweenX->m_isAnimating)) {
+	if (m_tweenXActive && (!m_tweenX->isAnimating())) {
 		m_tweenXActive = false;
 		SafeDelete(m_tweenX);
 	}
@@ -182,7 +182,7 @@ void Camera::update(float dt, const Circle& player) {
 		m_tweenX->update(dt);
 	}
 
-	if (m_tweenYActive && (!m_tweenY->m_isAnimating)) {
+	if (m_tweenYActive && (!m_tweenY->isAnimating())) {
 		m_tweenYActive = false;
 		SafeDelete(m_tweenY);
 	}

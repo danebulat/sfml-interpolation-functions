@@ -1,13 +1,11 @@
 #include "engine/tween.hpp"
 #include "engine/interpolate.hpp"
 
-// TODO: Initialise enum to choose interpolation
-// function type.
-
 using namespace animation;
 
 Tween::Tween()
-		: m_startValue(0.f)
+		: m_function(InterpFunc::QuartEaseOut)
+		, m_startValue(0.f)
 		, m_targetValue(0.f)
 		, m_changeValue(0.f)
 		, m_duration(0.f)
@@ -53,6 +51,10 @@ void Tween::start() {
 
 void Tween::stop() {
 	m_isAnimating = false;
+}
+
+bool Tween::isAnimating() const {
+	return m_isAnimating;
 }
 
 void Tween::update(float dt) {

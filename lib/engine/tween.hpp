@@ -45,7 +45,7 @@ enum class InterpFunc {
 	BounceEaseInOut = 31
 };
 
-struct Tween {
+class Tween {
 	// Reference to the property being animated
 	float* m_property;
 
@@ -58,6 +58,7 @@ struct Tween {
     float m_elapsedTime;
     bool  m_isAnimating;
 
+public:
     // Default constructor where members should be initialised
 	// manually after instantiation.
     Tween();
@@ -79,6 +80,7 @@ struct Tween {
 	void resetAndPlay();
 	void start();
 	void stop();
+	bool isAnimating() const;
 	void update(float dt);
 };
 

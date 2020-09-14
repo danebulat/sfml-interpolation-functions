@@ -230,7 +230,6 @@ void CameraDemo(RenderWindow& window, const Vector2f& resolution) {
             if (doClickDemo1) {
                 doClickDemo1 = false;
                 current_demo = 1;
-                std::cout << "> clicked\n";
             }
         }
         else {
@@ -242,7 +241,6 @@ void CameraDemo(RenderWindow& window, const Vector2f& resolution) {
             if (doClickDemo2) {
                 doClickDemo2 = false;
                 current_demo = 2;
-                std::cout << "> clicked\n";
             }
         }
         else {
@@ -400,7 +398,6 @@ void TweenSpawnDemo(RenderWindow& window, const Vector2f& resolution) {
             if (doClickDemo1) {
                 doClickDemo1 = false;
                 current_demo = 1;
-                std::cout << "> clicked\n";
             }
         }
         else {
@@ -412,7 +409,6 @@ void TweenSpawnDemo(RenderWindow& window, const Vector2f& resolution) {
             if (doClickDemo3) {
                 doClickDemo3 = false;
                 current_demo = 3;
-                std::cout << "> clicked\n";
             }
         }
         else {
@@ -627,7 +623,6 @@ void EasingDemo(RenderWindow& window, const Vector2f& resolution) {
             if (doClickDemo2) {
                 doClickDemo2 = false;
                 current_demo = 2;
-                std::cout << "> clicked\n";
             }
         }
         else {
@@ -639,7 +634,6 @@ void EasingDemo(RenderWindow& window, const Vector2f& resolution) {
             if (doClickDemo3) {
                 doClickDemo3 = false;
                 current_demo = 3;
-                std::cout << "> clicked\n";
             }
         }
         else {

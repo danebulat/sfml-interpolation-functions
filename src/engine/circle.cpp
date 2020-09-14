@@ -130,7 +130,7 @@ void Circle::createDemoTween(InterpFunc func) {
 
 // Starts or stops the tween by inverting its animation flag
 void Circle::startStopTweenToggle() {
-	if (!m_tweenA->m_isAnimating) {
+	if (!m_tweenA->isAnimating()) {
 		m_tweenA->start();
 	}
 	else {
