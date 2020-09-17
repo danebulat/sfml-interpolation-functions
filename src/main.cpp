@@ -11,6 +11,11 @@
 #include "engine/camera.hpp"
 #include "engine/utils.hpp"
 
+#include "imgui.h"
+#include "imgui-SFML.h"
+#include "imgui/imgui_utils.hpp"
+#include "imgui/imgui_demos.hpp"
+
 #include <cmath>
 
 using namespace animation;
@@ -26,12 +31,18 @@ void TweenSpawnDemo(RenderWindow&, const Vector2f&);
 
 unsigned int current_demo = 3;
 
+DemoManager demoManager; // ImGui
+
 int main()
 {
     util::Platform platform;
 
-    Vector2f resolution(800.f, 600.f);
+    Vector2f resolution(1024.f, 640.f);
     sf::RenderWindow window(sf::VideoMode(resolution.x,resolution.y,32), "Camera Animation Using Easing Functions With SFML", sf::Style::Default);
+
+    // Initialise ImGui
+    ImGui::SFML::Init(window);
+	demoManager.initialise(window);
 
     // NOTE: Set frame rate limit in Engine
     window.setFramerateLimit(60);
@@ -51,6 +62,9 @@ int main()
             break;
         }
     }
+
+    // clean up ImGui, such as deleting the internal font atlas
+    ImGui::SFML::Shutdown();
 
     return 0;
 }
@@ -140,6 +154,14 @@ void CameraDemo(RenderWindow& window, const Vector2f& resolution) {
     bool doClickDemo1 = false;
     bool doClickDemo2 = false;
 
+    // ------------------------------
+    // ImGui
+    // ------------------------------
+    int comboIndex = 0;
+    float tweenDuration = camera.getDuration();
+    float player1Col[4] = { 1.f, 1.f, 0.f };
+    float player2Col[4] = { 0.f, 1.f, 0.f };
+
     while (window.isOpen())
     {
         sf::Time dt = clock.restart();
@@ -148,6 +170,9 @@ void CameraDemo(RenderWindow& window, const Vector2f& resolution) {
         sf::Event event;
         while (window.pollEvent(event))
         {
+            // process ImGui events
+            ImGui::SFML::ProcessEvent(event);
+
             // Close window: exit
             if (event.type == sf::Event::Closed) {
                 current_demo = 0;
@@ -220,6 +245,132 @@ void CameraDemo(RenderWindow& window, const Vector2f& resolution) {
         // Update
         // ----------------------------------------------------------------------
 
+        // update ImGui
+        ImGui::SFML::Update(window, dt);
+
+        /*----------------------------------------------------------------------
+         Start ImGui
+         ----------------------------------------------------------------------*/
+        ImGui::Begin("Camera Demo");
+
+        float cameraPos[2] = { camera.getPosition().x, camera.getPosition().y };
+        float player1Pos[2] = { player1.getCenter().x, player1.getCenter().y };
+        float player2Pos[2] = { player2.getCenter().x, player2.getCenter().y };
+
+        if (ImGui::CollapsingHeader("Animation Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
+
+            // Switch player only if the tween is NOT active
+            float windowWidth = ImGui::GetWindowContentRegionWidth();
+            int i = 0;
+            ImGui::PushID(i);
+
+            if (!camera.isAnimating()) {
+                ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(i / 7.0f, 0.6f, 0.6f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(i / 7.0f, 0.7f, 0.7f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(i / 7.0f, 0.8f, 0.8f));
+
+                if (ImGui::Button("Animate", ImVec2(windowWidth, 45))) {
+
+                    // Determine which player to switch to
+                    if (player1Active) {
+                        player1.setActive(false);
+                        player2.setActive(true);
+                        camera.animateTo(player2.getCenter());
+                    }
+                    else {
+                        player1.setActive(true);
+                        player2.setActive(false);
+                        camera.animateTo(player1.getCenter());
+                    }
+
+                    player1Active = !player1Active;
+                }
+            }
+            else {
+                ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(i / 7.0f, 0.6f, 0.3f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(i / 7.0f, 0.7f, 0.35f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(i / 7.0f, 0.8f, 0.4f));
+                ImGui::Button("Animate", ImVec2(windowWidth, 45));
+            }
+
+            ImGui::PopStyleColor(3);
+            ImGui::PopID();
+
+            ImGui::AlignTextToFramePadding();
+            ImGui::Text("Easing Function"); ImGui::SameLine(130);
+            //ImGui::PushItemWidth(70.f);
+            ImGui::SetNextItemWidth(-1);
+            if (ImGui::Combo("##EasingFunction", &comboIndex, easingLabels)) {
+                camera.setInterpolation(static_cast<InterpFunc>(comboIndex + 1));
+            }
+
+            ImGui::AlignTextToFramePadding();
+            ImGui::Text("Tween Duration"); ImGui::SameLine(130);
+            ImGui::SetNextItemWidth(-1);
+            if (ImGui::SliderFloat("##TweenDuration", &tweenDuration, 0.2f, 30.0f, "%.1f secs")) {
+                camera.setDuration(tweenDuration);
+            }
+        }
+
+        if (ImGui::CollapsingHeader("Colors", ImGuiTreeNodeFlags_DefaultOpen)) {
+            ImGui::AlignTextToFramePadding();
+            ImGui::Text("Player 1"); ImGui::SameLine(80);
+            ImGui::SetNextItemWidth(-1);
+            if (ImGui::ColorEdit3("##Player1", player1Col,
+                    ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_DisplayHSV)) {
+                player1.setFillColor(sf::Color(
+                    static_cast<sf::Uint8>(player1Col[0] * 255.f),
+                    static_cast<sf::Uint8>(player1Col[1] * 255.f),
+                    static_cast<sf::Uint8>(player1Col[2] * 255.f)));
+            }
+
+            ImGui::AlignTextToFramePadding();
+            ImGui::Text("Player 2"); ImGui::SameLine(80);
+            ImGui::SetNextItemWidth(-1);
+            if (ImGui::ColorEdit3("##Player2", player2Col,
+                    ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_DisplayHSV)) {
+                player2.setFillColor(sf::Color(
+                    static_cast<sf::Uint8>(player2Col[0] * 255.f),
+                    static_cast<sf::Uint8>(player2Col[1] * 255.f),
+                    static_cast<sf::Uint8>(player2Col[2] * 255.f)));
+            }
+        }
+
+        if (ImGui::CollapsingHeader("Positions", ImGuiTreeNodeFlags_DefaultOpen)) {
+            ImGui::AlignTextToFramePadding();
+            ImGui::Text("Camera"); ImGui::SameLine(80);
+            ImGui::PushItemWidth(156.f);
+            ImGui::SetNextItemWidth(-1);
+            ImGui::InputFloat2("##Camera", cameraPos, 4, ImGuiInputTextFlags_ReadOnly);
+
+            ImGui::AlignTextToFramePadding();
+            ImGui::Text("Player 1"); ImGui::SameLine(80);
+            ImGui::PushItemWidth(156.f);
+            ImGui::SetNextItemWidth(-1);
+            ImGui::InputFloat2("##Player1", player1Pos, 4, ImGuiInputTextFlags_ReadOnly);
+
+            ImGui::AlignTextToFramePadding();
+            ImGui::Text("Player 2"); ImGui::SameLine(80);
+            ImGui::PushItemWidth(156.f);
+            ImGui::SetNextItemWidth(-1);
+            ImGui::InputFloat2("##Player2", player2Pos, 4, ImGuiInputTextFlags_ReadOnly);
+        }
+
+        if (ImGui::CollapsingHeader("Controls", ImGuiTreeNodeFlags_DefaultOpen)) {
+            ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Space");
+            ImGui::SameLine(80);
+            ImGui::Text("Switch player");
+
+            ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "WASD");
+            ImGui::SameLine(80);
+            ImGui::Text("Move active player");
+        }
+
+        ImGui::End();
+        /*----------------------------------------------------------------------
+         End ImGui
+         ----------------------------------------------------------------------*/
+
         // Update buttons
         btnEasingDemo.update(event, window);
         btnCircleDemo.update(event, window);
@@ -285,6 +436,9 @@ void CameraDemo(RenderWindow& window, const Vector2f& resolution) {
         window.draw(btnEasingDemo);
         window.draw(btnCircleDemo);
         window.draw(btnCameraDemo);
+
+        // Render ImGui windows
+        ImGui::SFML::Render(window);
 
         window.display();
 
@@ -359,6 +513,9 @@ void TweenSpawnDemo(RenderWindow& window, const Vector2f& resolution) {
         sf::Event event;
         while (window.pollEvent(event))
         {
+            // process ImGui events
+            ImGui::SFML::ProcessEvent(event);
+
             // Close window: exit
             if (event.type == sf::Event::Closed) {
                 current_demo = 0;
@@ -415,6 +572,11 @@ void TweenSpawnDemo(RenderWindow& window, const Vector2f& resolution) {
             doClickDemo3 = true;
         }
 
+        // update ImGui
+        ImGui::SFML::Update(window, dt);
+        demoManager.update(window);
+		if (demoManager.get_current_demo() != 1)
+        	window.clear();
 
         circle.update(dt.asSeconds());
 
@@ -425,6 +587,10 @@ void TweenSpawnDemo(RenderWindow& window, const Vector2f& resolution) {
         window.draw(btnEasingDemo);
         window.draw(btnCircleDemo);
         window.draw(btnCameraDemo);
+
+        // Render ImGui windows
+        ImGui::SFML::Render(window);
+
         window.display();
 
         // Switch to another demo?

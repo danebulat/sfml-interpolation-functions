@@ -41,6 +41,7 @@ public:
 
 	void setPosition(const Vector2f& position);
 	void setPosition(float x, float y);
+	void setFillColor(const sf::Color& color);
 	sf::Vector2f getCenter() const;
 
 	void update(float dt);

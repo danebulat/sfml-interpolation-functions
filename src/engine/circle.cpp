@@ -204,6 +204,10 @@ void Circle::setPosition(float x, float y) {
 	m_sprite.setPosition(x, y);
 }
 
+void Circle::setFillColor(const sf::Color& color) {
+	m_sprite.setFillColor(color);
+}
+
 sf::Vector2f Circle::getCenter() const {
 	sf::FloatRect localBounds = m_sprite.getLocalBounds();
 	float halfWidth = localBounds.width * .5f;
