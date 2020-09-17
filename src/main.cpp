@@ -269,7 +269,7 @@ void CameraDemo(RenderWindow& window, const Vector2f& resolution) {
             ImGui::Text("Player 1"); ImGui::SameLine(80);
             ImGui::SetNextItemWidth(-1);
             if (ImGui::ColorEdit3("##Player1", player1Col,
-                    ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_DisplayHSV)) {
+                    ImGuiColorEditFlags_PickerHueWheel)) {
                 player1.setFillColor(sf::Color(
                     static_cast<sf::Uint8>(player1Col[0] * 255.f),
                     static_cast<sf::Uint8>(player1Col[1] * 255.f),
@@ -280,7 +280,7 @@ void CameraDemo(RenderWindow& window, const Vector2f& resolution) {
             ImGui::Text("Player 2"); ImGui::SameLine(80);
             ImGui::SetNextItemWidth(-1);
             if (ImGui::ColorEdit3("##Player2", player2Col,
-                    ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_DisplayHSV)) {
+                    ImGuiColorEditFlags_PickerHueWheel)) {
                 player2.setFillColor(sf::Color(
                     static_cast<sf::Uint8>(player2Col[0] * 255.f),
                     static_cast<sf::Uint8>(player2Col[1] * 255.f),
