@@ -1,9 +1,9 @@
-#include <iostream>
-#include <sstream>
 #include <SFML/Graphics.hpp>
 #include "Platform/Platform.hpp"
-// #include <THOR/Shapes.hpp>
-// #include <THOR/Graphics.hpp>
+#include <iostream>
+#include <sstream>
+#include <cmath>
+
 #include "engine/button.hpp"
 #include "engine/circle.hpp"
 #include "engine/interpolate.hpp"
@@ -14,9 +14,6 @@
 #include "imgui.h"
 #include "imgui-SFML.h"
 #include "imgui/imgui_utils.hpp"
-#include "imgui/imgui_demos.hpp"
-
-#include <cmath>
 
 using namespace animation;
 using namespace demo::camera;
@@ -31,8 +28,6 @@ void TweenSpawnDemo(RenderWindow&, const Vector2f&);
 
 unsigned int current_demo = 3;
 
-DemoManager demoManager; // ImGui
-
 int main()
 {
     util::Platform platform;
@@ -42,7 +37,6 @@ int main()
 
     // Initialise ImGui
     ImGui::SFML::Init(window);
-	demoManager.initialise(window);
 
     // NOTE: Set frame rate limit in Engine
     window.setFramerateLimit(60);
@@ -96,23 +90,6 @@ void CameraDemo(RenderWindow& window, const Vector2f& resolution) {
     sf::View view(sf::FloatRect(0, 0, resolution.x, resolution.y));
     view.setCenter(player1.getCenter());
 
-    sf::Text label;
-    sf::Text controlsLabel;
-    std::vector<std::string> easingLabels;
-    initEasingLabels(easingLabels);
-
-    bool showHUD = true;
-
-    label.setFont(myfont);
-    label.setPosition(20.f, 1.f);
-    label.setCharacterSize(12);
-
-    controlsLabel.setFont(myfont);
-    controlsLabel.setCharacterSize(12);
-    controlsLabel.setString(getControlsString());
-    controlsLabel.setPosition(20.f, resolution.y -
-        controlsLabel.getLocalBounds().height - 10.f);
-
     /* Easing Demo Button */
     float btnX = resolution.x - 100.f;
     float btnY = resolution.y - 100.f;
@@ -157,7 +134,10 @@ void CameraDemo(RenderWindow& window, const Vector2f& resolution) {
     // ------------------------------
     // ImGui
     // ------------------------------
-    int comboIndex = 0;
+    std::vector<std::string> easingLabels;
+    initEasingLabels(easingLabels);
+
+    int comboIndex = static_cast<int>(InterpFunc::ElasticEaseOut);
     float tweenDuration = camera.getDuration();
     float player1Col[4] = { 1.f, 1.f, 0.f };
     float player2Col[4] = { 0.f, 1.f, 0.f };
@@ -187,34 +167,6 @@ void CameraDemo(RenderWindow& window, const Vector2f& resolution) {
                 if (event.key.code == sf::Keyboard::Escape) {
                     current_demo = 0;
                     window.close();
-                }
-
-                if (event.key.code == sf::Keyboard::Up) {
-                    int i = static_cast<int>(camera.getInterpolation());
-                    if (++i <= 31)
-                        camera.setInterpolation(static_cast<InterpFunc>(i));
-                    else
-                        camera.setInterpolation(static_cast<InterpFunc>(1));
-                }
-
-                if (event.key.code == sf::Keyboard::Down) {
-                    int i = static_cast<int>(camera.getInterpolation());
-                    if (--i >= 1)
-                        camera.setInterpolation(static_cast<InterpFunc>(i));
-                    else
-                        camera.setInterpolation(static_cast<InterpFunc>(31));
-                }
-
-                if (event.key.code == sf::Keyboard::Right) {
-                    camera.incrementDuration(.1f);
-                }
-
-                if (event.key.code == sf::Keyboard::Left) {
-                    camera.incrementDuration(-.1f);
-                }
-
-                if (event.key.code == sf::Keyboard::H) {
-                    showHUD = !showHUD;
                 }
 
                 // SPACE
@@ -307,7 +259,7 @@ void CameraDemo(RenderWindow& window, const Vector2f& resolution) {
             ImGui::AlignTextToFramePadding();
             ImGui::Text("Tween Duration"); ImGui::SameLine(130);
             ImGui::SetNextItemWidth(-1);
-            if (ImGui::SliderFloat("##TweenDuration", &tweenDuration, 0.2f, 30.0f, "%.1f secs")) {
+            if (ImGui::SliderFloat("##TweenDuration", &tweenDuration, 0.2f, 15.f, "%.1f secs")) {
                 camera.setDuration(tweenDuration);
             }
         }
@@ -407,13 +359,9 @@ void CameraDemo(RenderWindow& window, const Vector2f& resolution) {
         // Update camera (make it follow the player or animate to the active player)
         if (player1Active) {
             camera.update(dt.asSeconds(), player1);
-            label.setString(updateHUD(view, player1, easingLabels,
-                camera.getInterpolation(), camera.getDuration()));
         }
         else {
             camera.update(dt.asSeconds(), player2);
-            label.setString(updateHUD(view, player2, easingLabels,
-                camera.getInterpolation(), camera.getDuration()));
         }
 
         // Center view on camera's position
@@ -427,12 +375,6 @@ void CameraDemo(RenderWindow& window, const Vector2f& resolution) {
         player2.draw(window);
 
         window.setView(hud);
-
-        if (showHUD) {
-            window.draw(label);
-            window.draw(controlsLabel);
-        }
-
         window.draw(btnEasingDemo);
         window.draw(btnCircleDemo);
         window.draw(btnCameraDemo);
@@ -574,9 +516,6 @@ void TweenSpawnDemo(RenderWindow& window, const Vector2f& resolution) {
 
         // update ImGui
         ImGui::SFML::Update(window, dt);
-        demoManager.update(window);
-		if (demoManager.get_current_demo() != 1)
-        	window.clear();
 
         circle.update(dt.asSeconds());
 
